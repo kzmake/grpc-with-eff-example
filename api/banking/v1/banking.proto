@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package banking.v1;
+option go_package = "github.com/kzmake/grpcinscala/api/banking/v1;banking";
+
+import "google/api/annotations.proto";
+
+service BankingService {
+  rpc Deposit(DepositRequest) returns (DepositResponse) {
+    option (google.api.http) = {
+      post: "/v1/deposit"
+      body: "*"
+    };
+  }
+}
+
+message DepositRequest {}
+
+message DepositResponse {
+  Money money = 1;
+}
+
+message Money {
+  uint64 amount = 1;
+  string currency = 2;
+}
