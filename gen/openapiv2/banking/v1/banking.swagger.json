@@ -1,0 +1,104 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "banking/v1/banking.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "BankingService"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/v1/deposit": {
+      "post": {
+        "operationId": "BankingService_Deposit",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1DepositResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1DepositRequest"
+            }
+          }
+        ],
+        "tags": [
+          "BankingService"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "v1DepositRequest": {
+      "type": "object"
+    },
+    "v1DepositResponse": {
+      "type": "object",
+      "properties": {
+        "money": {
+          "$ref": "#/definitions/v1Money"
+        }
+      }
+    },
+    "v1Money": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "currency": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}
