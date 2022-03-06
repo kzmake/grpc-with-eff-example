@@ -14,13 +14,16 @@ service BankingService {
   }
 }
 
-message DepositRequest {}
-
-message DepositResponse {
-  Money money = 1;
+message DepositRequest {
+  string account_id = 1;
+  uint64 money = 2;
 }
 
-message Money {
-  uint64 amount = 1;
-  string currency = 2;
+message DepositResponse {
+  Account account = 1;
+}
+
+message Account {
+  string account_id = 1;
+  uint64 money = 2;
 }
