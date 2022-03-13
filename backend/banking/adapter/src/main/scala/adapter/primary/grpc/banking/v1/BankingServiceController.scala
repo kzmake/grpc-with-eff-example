@@ -10,7 +10,7 @@ import usecase.port.Port
 import scala.concurrent.Future
 
 class BankingServiceController(
-    createAccount: Port[CreateAccountInputData, CreateAccountOutputData]
+    val createAccount: Port[CreateAccountInputData, CreateAccountOutputData]
 ) extends BankingService {
 
   override def createAccount(in: CreateAccountRequest): Future[CreateAccountResponse] = {

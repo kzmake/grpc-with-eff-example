@@ -1,14 +1,18 @@
 package usecase.interactor
 
 import domain.account.Account
+import domain.base.Repository
 import org.atnos.eff.Eff
 import usecase.port.Port
 import usecase.port.InputData
 import usecase.port.OutputData
 
-class CreateAccountInteractor extends Port[CreateAccountInputData, CreateAccountOutputData] {
+class CreateAccountInteractor(
+    val accountRepository: Repository[Account]
+) extends Port[CreateAccountInputData, CreateAccountOutputData] {
   def execute[R](in: CreateAccountInputData): Eff[R, CreateAccountOutputData] = for {
-    created <- Account.applyEff[R]
+    account <- Account.applyEff[R]
+    created <- accountRepository.add[R](account)
   } yield CreateAccountOutputData(payload = created)
 }
 

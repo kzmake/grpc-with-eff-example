@@ -9,7 +9,7 @@ import org.atnos.eff.syntax.all.toEffPureOps
 import scala.collection.concurrent.TrieMap
 
 class AccountRepository(
-    val datastore: TrieMap[Id[Account], Account]
+    var datastore: TrieMap[Id[Account], Account]
 ) extends Repository[Account] {
   override def add[R](aggregateRoot: Account): Eff[R, Account] = {
     datastore.addOne(aggregateRoot.id, aggregateRoot)
