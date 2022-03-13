@@ -1,7 +1,8 @@
 syntax = "proto3";
 
-package api.banking.v1;
+package banking.v1;
 
+option java_package = "api.banking.v1";
 option go_package = "github.com/kzmake/grpcinscala/api/banking/v1;banking";
 
 import "google/api/annotations.proto";
