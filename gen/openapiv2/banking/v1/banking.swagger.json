@@ -16,14 +16,14 @@
     "application/json"
   ],
   "paths": {
-    "/v1/deposit": {
+    "/v1/accounts": {
       "post": {
-        "operationId": "BankingService_Deposit",
+        "operationId": "BankingService_CreateAccount",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1DepositResponse"
+              "$ref": "#/definitions/v1CreateAccountResponse"
             }
           },
           "default": {
@@ -39,7 +39,153 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/v1DepositRequest"
+              "$ref": "#/definitions/v1CreateAccountRequest"
+            }
+          }
+        ],
+        "tags": [
+          "BankingService"
+        ]
+      }
+    },
+    "/v1/accounts/{id}": {
+      "get": {
+        "operationId": "BankingService_GetAccount",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetAccountResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "BankingService"
+        ]
+      },
+      "delete": {
+        "operationId": "BankingService_DeleteAccount",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1DeleteAccountResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "BankingService"
+        ]
+      }
+    },
+    "/v1/accounts/{id}/deposit": {
+      "post": {
+        "operationId": "BankingService_DepositMoney",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1DepositMoneyResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "money": {
+                  "type": "string",
+                  "format": "uint64"
+                }
+              }
+            }
+          }
+        ],
+        "tags": [
+          "BankingService"
+        ]
+      }
+    },
+    "/v1/accounts/{id}/withdraw": {
+      "post": {
+        "operationId": "BankingService_WithdrawMoney",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1WithdrawMoneyResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "money": {
+                  "type": "string",
+                  "format": "uint64"
+                }
+              }
             }
           }
         ],
@@ -77,26 +223,53 @@
         }
       }
     },
-    "v1DepositRequest": {
-      "type": "object"
-    },
-    "v1DepositResponse": {
+    "v1Account": {
       "type": "object",
       "properties": {
-        "money": {
-          "$ref": "#/definitions/v1Money"
+        "id": {
+          "type": "string"
+        },
+        "balance": {
+          "type": "string",
+          "format": "uint64"
         }
       }
     },
-    "v1Money": {
+    "v1CreateAccountRequest": {
+      "type": "object"
+    },
+    "v1CreateAccountResponse": {
       "type": "object",
       "properties": {
-        "amount": {
-          "type": "string",
-          "format": "uint64"
-        },
-        "currency": {
-          "type": "string"
+        "account": {
+          "$ref": "#/definitions/v1Account"
+        }
+      }
+    },
+    "v1DeleteAccountResponse": {
+      "type": "object"
+    },
+    "v1DepositMoneyResponse": {
+      "type": "object",
+      "properties": {
+        "account": {
+          "$ref": "#/definitions/v1Account"
+        }
+      }
+    },
+    "v1GetAccountResponse": {
+      "type": "object",
+      "properties": {
+        "account": {
+          "$ref": "#/definitions/v1Account"
+        }
+      }
+    },
+    "v1WithdrawMoneyResponse": {
+      "type": "object",
+      "properties": {
+        "account": {
+          "$ref": "#/definitions/v1Account"
         }
       }
     }
