@@ -1,29 +1,82 @@
 syntax = "proto3";
 
-package banking.v1;
+package api.banking.v1;
+
 option go_package = "github.com/kzmake/grpcinscala/api/banking/v1;banking";
 
 import "google/api/annotations.proto";
 
 service BankingService {
-  rpc Deposit(DepositRequest) returns (DepositResponse) {
+  rpc CreateAccount(CreateAccountRequest) returns (CreateAccountResponse) {
     option (google.api.http) = {
-      post: "/v1/deposit"
+      post: "/v1/accounts"
       body: "*"
+    };
+  }
+
+  rpc GetAccount(GetAccountRequest) returns (GetAccountResponse) {
+    option (google.api.http) = {
+      get: "/v1/accounts/{id}"
+    };
+  }
+
+  rpc DepositMoney(DepositMoneyRequest) returns (DepositMoneyResponse) {
+    option (google.api.http) = {
+      post: "/v1/accounts/{id}/deposit"
+      body: "*"
+    };
+  }
+
+  rpc WithdrawMoney(WithdrawMoneyRequest) returns (WithdrawMoneyResponse) {
+    option (google.api.http) = {
+      post: "/v1/accounts/{id}/withdraw"
+      body: "*"
+    };
+  }
+
+  rpc DeleteAccount(DeleteAccountRequest) returns (DeleteAccountResponse) {
+    option (google.api.http) = {
+      delete: "/v1/accounts/{id}"
     };
   }
 }
 
-message DepositRequest {
-  string account_id = 1;
-  uint64 money = 2;
+message CreateAccountRequest {
 }
-
-message DepositResponse {
+message CreateAccountResponse {
   Account account = 1;
 }
 
-message Account {
-  string account_id = 1;
+message GetAccountRequest {
+  string id = 1;
+}
+message GetAccountResponse {
+  Account account = 1;
+}
+
+message DepositMoneyRequest {
+  string id = 1;
   uint64 money = 2;
+}
+message DepositMoneyResponse {
+  Account account = 1;
+}
+
+message WithdrawMoneyRequest {
+  string id = 1;
+  uint64 money = 2;
+}
+message WithdrawMoneyResponse {
+  Account account = 1;
+}
+
+message DeleteAccountRequest {
+  string id = 1;
+}
+message DeleteAccountResponse {
+}
+
+message Account {
+  string id = 1;
+  uint64 balance = 2;
 }
