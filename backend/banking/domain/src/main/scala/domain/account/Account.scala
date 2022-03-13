@@ -22,5 +22,5 @@ final case class Account(id: Id[Account], balance: Money) extends AggregateRoot[
 }
 
 object Account {
-  def applyEff[R]: Eff[R, Account] = Account(id = Id[Account]("1"), balance = Money(0)).pureEff[R]
+  def applyEff[R]: Eff[R, Account] = Account(id = Id[Account]("1"), balance = Money(100)).pureEff[R]
 }
