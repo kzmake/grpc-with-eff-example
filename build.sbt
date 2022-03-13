@@ -14,10 +14,10 @@ ThisBuild / scalacOptions ++= Seq(
 )
 
 lazy val api = (project in file("api"))
-  .settings(name := "api")
   .enablePlugins(AkkaGrpcPlugin)
+  .settings(name := "api")
   .settings(protoSettings)
-  .settings(Compile / PB.protoSources += file("api"))
+  .settings(Compile / PB.protoSources += file("api/banking"))
 
 lazy val bankingCtxDomain = (project in file("backend/banking/domain"))
   .settings(name := s"${baseName}-banking-domain")
