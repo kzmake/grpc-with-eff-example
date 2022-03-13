@@ -1,6 +1,6 @@
 
-# Created by https://www.toptal.com/developers/gitignore/api/go,vim,scala,linux,emacs,macos,direnv,dotenv,windows,intellij,intellij+iml,intellij+all,visualstudiocode,bloop,metals
-# Edit at https://www.toptal.com/developers/gitignore?templates=go,vim,scala,linux,emacs,macos,direnv,dotenv,windows,intellij,intellij+iml,intellij+all,visualstudiocode,bloop,metals
+# Created by https://www.toptal.com/developers/gitignore/api/go,sbt,vim,scala,linux,bloop,emacs,macos,metals,direnv,dotenv,windows,intellij,intellij+iml,intellij+all,visualstudiocode
+# Edit at https://www.toptal.com/developers/gitignore?templates=go,sbt,vim,scala,linux,bloop,emacs,macos,metals,direnv,dotenv,windows,intellij,intellij+iml,intellij+all,visualstudiocode
 
 ### Bloop ###
 .bloop/
@@ -361,6 +361,20 @@ Temporary Items
 .metals/
 project/**/metals.sbt
 
+### SBT ###
+# Simple Build Tool
+# http://www.scala-sbt.org/release/docs/Getting-Started/Directories.html#configuring-version-control
+
+dist/*
+target/
+lib_managed/
+src_managed/
+project/boot/
+project/plugins/project/
+.history
+.cache
+.lib/
+
 ### Scala ###
 *.class
 *.log
@@ -404,7 +418,6 @@ tags
 
 ### VisualStudioCode Patch ###
 # Ignore all local history of files
-.history
 .ionide
 
 # Support for Project snippet scope
@@ -435,4 +448,4 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
-# End of https://www.toptal.com/developers/gitignore/api/go,vim,scala,linux,emacs,macos,direnv,dotenv,windows,intellij,intellij+iml,intellij+all,visualstudiocode,bloop,metals
+# End of https://www.toptal.com/developers/gitignore/api/go,sbt,vim,scala,linux,bloop,emacs,macos,metals,direnv,dotenv,windows,intellij,intellij+iml,intellij+all,visualstudiocode
