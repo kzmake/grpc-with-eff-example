@@ -1,9 +1,10 @@
 package domain.account
 
 import domain.base.AggregateRoot
+import domain.eff.IdGen
+import domain.eff.IdGen._idgen
 import domain.shared.Id
 import org.atnos.eff.Eff
-import org.atnos.eff.syntax.all.toEffPureOps
 
 final case class Account(id: Id[Account], balance: Money) extends AggregateRoot[Account] {
   assert(id.value.nonEmpty, "口座番号は空にならない")
@@ -22,5 +23,7 @@ final case class Account(id: Id[Account], balance: Money) extends AggregateRoot[
 }
 
 object Account {
-  def applyEff[R]: Eff[R, Account] = Account(id = Id[Account]("1"), balance = Money(100)).pureEff[R]
+  def applyEff[R: _idgen]: Eff[R, Account] = for {
+    id <- IdGen.generate[Account, R]
+  } yield Account(id = id, balance = Money(100))
 }

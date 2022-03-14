@@ -1,7 +1,8 @@
 package adapter.eff
 
-import org.atnos.eff.{Fx, TimedFuture}
+import domain.eff.IdGen
+import org.atnos.eff._
 
 object Stack {
-  type CommandAllStack = Fx.fx1[TimedFuture]
+  type AllStack = Fx.fx1[IdGen]
 }

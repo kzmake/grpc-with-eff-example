@@ -2,6 +2,7 @@ package usecase.interactor
 
 import domain.account.Account
 import domain.base.Repository
+import domain.eff.IdGen._idgen
 import domain.shared.Id
 import org.atnos.eff.Eff
 import usecase.port.Port
@@ -11,7 +12,7 @@ import usecase.port.OutputData
 class GetAccountInteractor(
     val accountRepository: Repository[Account]
 ) extends Port[GetAccountInputData, GetAccountOutputData] {
-  def execute[R](in: GetAccountInputData): Eff[R, GetAccountOutputData] = for {
+  def execute[R: _idgen](in: GetAccountInputData): Eff[R, GetAccountOutputData] = for {
     got <- accountRepository.resolve[R](Id[Account](in.id))
   } yield GetAccountOutputData(payload = got)
 }

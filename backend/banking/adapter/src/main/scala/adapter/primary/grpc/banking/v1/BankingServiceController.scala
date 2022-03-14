@@ -2,8 +2,9 @@ package adapter.primary.grpc.banking.v1
 
 import api.banking.v1._
 import adapter.eff.Stack._
-import org.atnos.eff.syntax.all.toEffOnePureValueOps
-import usecase.interactor.{CreateAccountInputData, CreateAccountOutputData, GetAccountInputData, GetAccountOutputData}
+import adapter.secondary.uuid.UUIDIdGenOps.IdGenOps
+import org.atnos.eff.syntax.all._
+import usecase.interactor._
 import usecase.port.Port
 
 import scala.concurrent.Future
@@ -17,7 +18,8 @@ class BankingServiceController(
     val in = CreateAccountInputData()
     val out =
       createAccount
-        .execute[CommandAllStack](in)
+        .execute[AllStack](in)
+        .runIdGen
         .runPure
 
     out match {
@@ -40,7 +42,7 @@ class BankingServiceController(
     val in = GetAccountInputData(id = req.id)
     val out =
       getAccount
-        .execute[CommandAllStack](in)
+        .execute[AllStack](in)
         .runPure
 
     out match {
