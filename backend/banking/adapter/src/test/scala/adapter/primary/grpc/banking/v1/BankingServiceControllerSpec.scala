@@ -2,7 +2,7 @@ package adapter.primary.grpc.banking.v1
 
 import adapter.secondary.memory.AccountRepository
 import api.banking._
-import domain.account.{Account, Money}
+import domain.account.{Money, Account}
 import domain.shared.Id
 import org.scalatest.concurrent.ScalaFutures.convertScalaFuture
 import org.scalatest.freespec.AnyFreeSpec
@@ -24,7 +24,7 @@ class BankingServiceControllerSpec extends AnyFreeSpec {
       val expected = v1.CreateAccountResponse(
         Some(
           v1.Account(
-            id = "1",
+            id = """(\w){8}-(\w){4}-(\w){4}-(\w){4}-(\w){12}""", // random uuid
             balance = 100
           )
         )
@@ -32,7 +32,8 @@ class BankingServiceControllerSpec extends AnyFreeSpec {
 
       val res = service.createAccount(req).futureValue
 
-      res mustBe expected
+      res.account.get.id must fullyMatch regex expected.account.get.id
+      res.account.get.balance mustBe expected.account.get.balance
     }
   }
 

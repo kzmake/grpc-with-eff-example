@@ -1,10 +1,9 @@
 package adapter.secondary.uuid
 
 import java.util.UUID
-import domain.eff.IdGen.Generate
 import domain.shared.Id
 import org.atnos.eff.Interpret.translate
-import domain.eff.{IdGenInterpreter, IdGen}
+import domain.eff._
 import org.atnos.eff._
 import org.atnos.eff.syntax.all._
 

@@ -13,7 +13,6 @@ class BankingServiceController(
     val createAccount: Port[CreateAccountInputData, CreateAccountOutputData],
     val getAccount: Port[GetAccountInputData, GetAccountOutputData]
 ) extends BankingService {
-
   override def createAccount(req: CreateAccountRequest): Future[CreateAccountResponse] = {
     val in = CreateAccountInputData()
     val out =
