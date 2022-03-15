@@ -1,8 +1,8 @@
 package adapter.eff
 
-import domain.eff.IdGen
+import domain.eff._
 import org.atnos.eff._
 
 object Stack {
-  type AllStack = Fx.fx1[IdGen]
+  type AllStack = Fx.fx2[Authz, IdGen]
 }

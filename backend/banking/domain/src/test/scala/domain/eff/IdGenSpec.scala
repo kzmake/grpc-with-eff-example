@@ -1,7 +1,6 @@
 package domain.eff
 
 import domain.account.Account
-import domain.eff.IdGen._
 import domain.shared.Id
 import org.atnos.eff.Interpret.translate
 import org.atnos.eff._

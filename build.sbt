@@ -9,14 +9,15 @@ ThisBuild / scalafixScalaBinaryVersion := CrossVersion.binaryScalaVersion(scalaV
 ThisBuild / semanticdbVersion          := scalafixSemanticdb.revision // only required for Scala 2.x
 ThisBuild / scalacOptions ++= Seq(
   "-unchecked",
-  "-deprecation",
-  "-Wunused:imports" // Scala 2.x only, required by `RemoveUnused`
+  "-deprecation"
 )
 
 lazy val api = (project in file("api"))
   .enablePlugins(AkkaGrpcPlugin)
   .settings(name := "api")
   .settings(protoSettings)
+  .settings(Compile / akkaGrpcCodeGeneratorSettings += "server_power_apis")
+  .settings(Compile / akkaGrpcGeneratedSources := Seq(AkkaGrpc.Client, AkkaGrpc.Server))
   .settings(Compile / PB.protoSources += file("api/banking"))
 
 lazy val bankingCtxDomain = (project in file("backend/banking/domain"))
