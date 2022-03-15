@@ -1,7 +1,8 @@
 package domain.eff
 
+import domain.eff.MyErrorEither._myErrorEither
 import org.atnos.eff._
 
 trait AuthzInterpreter {
-  def run[R, U, A](effects: Eff[R, A])(implicit m: Member.Aux[Authz, R, U]): Eff[U, A]
+  def run[R, U, A](effects: Eff[R, A])(implicit m: Member.Aux[Authz, R, U], m1: _myErrorEither[U]): Eff[U, A]
 }

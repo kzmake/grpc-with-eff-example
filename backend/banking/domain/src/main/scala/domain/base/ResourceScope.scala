@@ -1,5 +1,5 @@
 package domain.base
 
 trait ResourceScope {
-  val resourceScope: List[String]
+  val resourceScope: Set[String]
 }

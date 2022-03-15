@@ -1,8 +1,9 @@
 package adapter.eff
 
+import domain.eff.MyErrorEither.MyErrorEither
 import domain.eff._
 import org.atnos.eff._
 
 object Stack {
-  type AllStack = Fx.fx2[Authz, IdGen]
+  type AStack = Fx.fx3[Authz, IdGen, MyErrorEither]
 }

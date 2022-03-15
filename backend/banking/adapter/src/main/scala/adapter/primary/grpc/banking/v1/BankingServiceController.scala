@@ -8,6 +8,7 @@ import akka.grpc.scaladsl.Metadata
 import org.atnos.eff.syntax.all._
 import usecase.interactor._
 import usecase.port.Port
+import domain.error.MyError
 
 import scala.concurrent.Future
 
@@ -18,51 +19,53 @@ class BankingServiceController(
   override def createAccount(req: CreateAccountRequest, metadata: Metadata): Future[CreateAccountResponse] = {
     val principal = metadata.getText("principal").getOrElse("")
     val in        = CreateAccountInputData()
-    val out =
-      createAccount
-        .execute[AllStack](in)
-        .runAuthz(principal)
-        .runIdGen
-        .runPure
+
+    val out = createAccount
+      .execute[AStack](in)
+      .runAuthz(principal)
+      .runIdGen
+      .runEither[MyError]
+      .run
 
     out match {
-      case Some(x) =>
+      case Right(v) =>
         Future.successful(
           CreateAccountResponse(
             Some(
               Account(
-                id = x.payload.id.value,
-                balance = x.payload.balance.value
+                id = v.payload.id.value,
+                balance = v.payload.balance.value
               )
             )
           )
         )
-      case None => Future.failed(new Exception("failed"))
+      case Left(e) => Future.failed(e)
     }
   }
 
   override def getAccount(req: GetAccountRequest, metadata: Metadata): Future[GetAccountResponse] = {
     val principal = metadata.getText("principal").getOrElse("")
     val in        = GetAccountInputData(id = req.id)
-    val out =
-      getAccount
-        .execute[AllStack](in)
-        .runAuthz(principal)
-        .runPure
+    val out = getAccount
+      .execute[AStack](in)
+      .runAuthz(principal)
+      .runIdGen
+      .runEither[MyError]
+      .run
 
     out match {
-      case Some(x) =>
+      case Right(v) =>
         Future.successful(
           GetAccountResponse(
             Some(
               Account(
-                id = x.payload.id.value,
-                balance = x.payload.balance.value
+                id = v.payload.id.value,
+                balance = v.payload.balance.value
               )
             )
           )
         )
-      case None => Future.failed(new Exception("failed"))
+      case Left(e) => Future.failed(e)
     }
   }
 
