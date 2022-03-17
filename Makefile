@@ -21,6 +21,10 @@ http:
 	:
 	curl -i -X GET http://localhost:8080/v1/accounts/11111111-1111-1111-1111-111111111111 -H "principal: alice"
 	:
+	curl -i -X POST http://localhost:8080/v1/accounts/11111111-1111-1111-1111-111111111111/withdraw -H "principal: alice" -d '{"money": 1000}'
+	:
+	curl -i -X POST http://localhost:8080/v1/accounts/11111111-1111-1111-1111-111111111111/deposit -H "principal: alice" -d '{"money": 1000}'
+	:
 	curl -i -X GET http://localhost:8080/v1/accounts/11111111-1111-1111-1111-111111111111 -H "principal: bob"
 
 .PHONY: grpc

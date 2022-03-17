@@ -12,7 +12,7 @@ trait ReadRepository[T <: AggregateRoot[T]] {
     maybe <- get[R](id)
     aggregateRoot <- fromEither[R, MyError, T](maybe match {
       case Some(v) => Right(v)
-      case None    => Left(NotFoundAccountError(s"failed: $id"))
+      case None    => Left(NotFoundError(s"リソースが見つかりませんでした: $id"))
     })
   } yield aggregateRoot
 

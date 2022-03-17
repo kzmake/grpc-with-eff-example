@@ -3,27 +3,57 @@ package domain.account
 import domain.base.AggregateRoot
 import domain.eff.IdGen
 import domain.eff.IdGen._idgen
+import domain.eff.MyErrorEither._myErrorEither
+import domain.error._
 import domain.shared.Id
 import org.atnos.eff.Eff
+import org.atnos.eff.all.fromEither
+import org.atnos.eff.syntax.all.toEffPureOps
 
 final case class Account(id: Id[Account], balance: Money) extends AggregateRoot[Account] {
   assert(id.value.nonEmpty, "口座番号は空にならない")
   assert(balance >= Money.zero, "残高が0未満になることはない")
 
-  def deposit(money: Money): Account = {
+  def deposit[R](money: Money): Eff[R, Account] = {
     require(Money.zero < money, "預け入れ額は1以上")
-    copy(balance = balance + money)
-      .ensuring(Money.zero <= _.balance, "残高が0未満になることはない")
+    copy(balance = balance + money).pureEff[R]
   }
-  def withdraw(money: Money): Account = {
-    require(Money.zero < money && money <= balance, "引き落とせる額は0より大きく、残高と同額まで")
-    copy(balance = balance - money)
-      .ensuring(Money.zero <= _.balance, "残高が0未満になることはない")
+  def withdraw[R: _myErrorEither](money: Money): Eff[R, Account] = {
+    require(Money.zero < money, "引き出し額は1以上")
+    for {
+      account <- fromEither[R, MyError, Account](
+        if (money <= this.balance) Right(copy(balance = balance - money))
+        else Left(StateError("残高が不足しています"))
+      )
+    } yield account
   }
 }
 
 object Account {
   def applyEff[R: _idgen]: Eff[R, Account] = for {
     id <- IdGen.generate[Account, R]
-  } yield Account(id = id, balance = Money(100))
+  } yield Account(id = id, balance = Money.zero)
+
+  def applyEff[R: _idgen: _myErrorEither](balance: Money): Eff[R, Account] = for {
+    id <- IdGen.generate[Account, R]
+    validId <- fromEither[R, MyError, Id[Account]](
+      if (id.value.nonEmpty) Right(id)
+      else Left(InvalidError("口座番号は空にできません"))
+    )
+    validBalance <- fromEither[R, MyError, Money](
+      if (Money.zero <= balance) Right(balance)
+      else Left(InvalidError("残高は0未満にできません"))
+    )
+  } yield Account(id = validId, balance = validBalance)
+
+  def applyEff[R: _myErrorEither](id: Id[Account], balance: Money): Eff[R, Account] = for {
+    validId <- fromEither[R, MyError, Id[Account]](
+      if (id.value.nonEmpty) Right(id)
+      else Left(InvalidError("口座番号は空にできません"))
+    )
+    validBalance <- fromEither[R, MyError, Money](
+      if (Money.zero <= balance) Right(balance)
+      else Left(InvalidError("残高は0未満にできません"))
+    )
+  } yield Account(id = validId, balance = validBalance)
 }

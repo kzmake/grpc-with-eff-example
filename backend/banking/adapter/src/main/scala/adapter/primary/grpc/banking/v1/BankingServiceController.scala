@@ -13,14 +13,17 @@ import domain.error.MyError
 import scala.concurrent.Future
 
 class BankingServiceController(
-    val createAccount: Port[CreateAccountInputData, CreateAccountOutputData],
-    val getAccount: Port[GetAccountInputData, GetAccountOutputData]
+    val createAccountPort: Port[CreateAccountInputData, CreateAccountOutputData],
+    val getAccountPort: Port[GetAccountInputData, GetAccountOutputData],
+    val depositMoneyPort: Port[DepositMoneyInputData, DepositMoneyOutputData],
+    val withdrawMoneyPort: Port[WithdrawMoneyInputData, WithdrawMoneyOutputData],
+    val deleteAccountPort: Port[DeleteAccountInputData, DeleteAccountOutputData]
 ) extends BankingServicePowerApi {
   override def createAccount(req: CreateAccountRequest, metadata: Metadata): Future[CreateAccountResponse] = {
     val principal = metadata.getText("principal").getOrElse("none")
     val in        = CreateAccountInputData()
 
-    val out = createAccount
+    val out = createAccountPort
       .execute[AStack](in)
       .runAuthz(principal)
       .runIdGen
@@ -46,7 +49,7 @@ class BankingServiceController(
   override def getAccount(req: GetAccountRequest, metadata: Metadata): Future[GetAccountResponse] = {
     val principal = metadata.getText("principal").getOrElse("none")
     val in        = GetAccountInputData(id = req.id)
-    val out = getAccount
+    val out = getAccountPort
       .execute[AStack](in)
       .runAuthz(principal)
       .runIdGen
@@ -69,9 +72,71 @@ class BankingServiceController(
     }
   }
 
-  override def depositMoney(req: DepositMoneyRequest, metadata: Metadata): Future[DepositMoneyResponse] = ???
+  override def depositMoney(req: DepositMoneyRequest, metadata: Metadata): Future[DepositMoneyResponse] = {
+    val principal = metadata.getText("principal").getOrElse("none")
+    val in        = DepositMoneyInputData(id = req.id, money = req.money)
+    val out = depositMoneyPort
+      .execute[AStack](in)
+      .runAuthz(principal)
+      .runIdGen
+      .runEither[MyError]
+      .run
 
-  override def withdrawMoney(req: WithdrawMoneyRequest, metadata: Metadata): Future[WithdrawMoneyResponse] = ???
+    out match {
+      case Right(v) =>
+        Future.successful(
+          DepositMoneyResponse(
+            Some(
+              Account(
+                id = v.payload.id.value,
+                balance = v.payload.balance.value
+              )
+            )
+          )
+        )
+      case Left(e) => Future.failed(e)
+    }
+  }
 
-  override def deleteAccount(req: DeleteAccountRequest, metadata: Metadata): Future[DeleteAccountResponse] = ???
+  override def withdrawMoney(req: WithdrawMoneyRequest, metadata: Metadata): Future[WithdrawMoneyResponse] = {
+    val principal = metadata.getText("principal").getOrElse("none")
+    val in        = WithdrawMoneyInputData(id = req.id, money = req.money)
+    val out = withdrawMoneyPort
+      .execute[AStack](in)
+      .runAuthz(principal)
+      .runIdGen
+      .runEither[MyError]
+      .run
+
+    out match {
+      case Right(v) =>
+        Future.successful(
+          WithdrawMoneyResponse(
+            Some(
+              Account(
+                id = v.payload.id.value,
+                balance = v.payload.balance.value
+              )
+            )
+          )
+        )
+      case Left(e) => Future.failed(e)
+    }
+  }
+
+  override def deleteAccount(req: DeleteAccountRequest, metadata: Metadata): Future[DeleteAccountResponse] = {
+    val principal = metadata.getText("principal").getOrElse("none")
+    val in        = DeleteAccountInputData(id = req.id)
+    val out = deleteAccountPort
+      .execute[AStack](in)
+      .runAuthz(principal)
+      .runIdGen
+      .runEither[MyError]
+      .run
+
+    out match {
+      case Right(v) => Future.successful(DeleteAccountResponse())
+      case Left(e)  => Future.failed(e)
+    }
+  }
 }
