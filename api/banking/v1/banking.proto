@@ -6,6 +6,7 @@ option java_package = "api.banking.v1";
 option go_package = "github.com/kzmake/grpcinscala/api/banking/v1;banking";
 
 import "google/api/annotations.proto";
+import "validate/validate.proto";
 
 service BankingService {
   rpc CreateAccount(CreateAccountRequest) returns (CreateAccountResponse) {
@@ -57,7 +58,7 @@ message GetAccountResponse {
 
 message DepositMoneyRequest {
   string id = 1;
-  uint64 money = 2;
+  uint64 money = 2 [(validate.rules).uint64 = { gte: 1,  lte: 500000 }];
 }
 message DepositMoneyResponse {
   Account account = 1;

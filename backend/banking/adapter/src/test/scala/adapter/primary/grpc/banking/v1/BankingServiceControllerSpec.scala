@@ -223,4 +223,362 @@ class BankingServiceControllerSpec extends AnyFreeSpec {
     }
 
   }
+
+  "#depositMoney" - {
+    "OK: aliceが口座に預け入れできる" in {
+      val datastore = TrieMap(
+        Id[Account]("1") -> Account(id = Id[Account]("1"), balance = Money(1000)),
+        Id[Account]("2") -> Account(id = Id[Account]("2"), balance = Money(999))
+      )
+      val accountRepository = new AccountRepository(datastore)
+      val createAccount     = new CreateAccountInteractor(accountRepository)
+      val getAccount        = new GetAccountInteractor(accountRepository)
+      val depositMoney      = new DepositMoneyInteractor(accountRepository)
+      val withdrawMoney     = new WithdrawMoneyInteractor(accountRepository)
+      val deleteAccount     = new DeleteAccountInteractor(accountRepository)
+      val service = new BankingServiceController(
+        createAccount,
+        getAccount,
+        depositMoney,
+        withdrawMoney,
+        deleteAccount
+      )
+
+      val md  = new MetadataBuilder().addText("principal", "alice").build()
+      val req = v1.DepositMoneyRequest(id = "1", money = 10000)
+      val expected = v1.DepositMoneyResponse(
+        Some(
+          v1.Account(
+            id = "1",
+            balance = 11000
+          )
+        )
+      )
+
+      val res = service.depositMoney(req, md).futureValue
+
+      res mustBe expected
+    }
+
+    "OK: aliceが作成した口座に預け入れできる" in {
+      val datastore = TrieMap(
+        Id[Account]("1") -> Account(id = Id[Account]("1"), balance = Money(1000)),
+        Id[Account]("2") -> Account(id = Id[Account]("2"), balance = Money(999))
+      )
+      val accountRepository = new AccountRepository(datastore)
+      val createAccount     = new CreateAccountInteractor(accountRepository)
+      val getAccount        = new GetAccountInteractor(accountRepository)
+      val depositMoney      = new DepositMoneyInteractor(accountRepository)
+      val withdrawMoney     = new WithdrawMoneyInteractor(accountRepository)
+      val deleteAccount     = new DeleteAccountInteractor(accountRepository)
+      val service = new BankingServiceController(
+        createAccount,
+        getAccount,
+        depositMoney,
+        withdrawMoney,
+        deleteAccount
+      )
+
+      val md = new MetadataBuilder().addText("principal", "alice").build()
+
+      // created
+      val createRes = service.createAccount(v1.CreateAccountRequest(), md).futureValue
+
+      val req = v1.DepositMoneyRequest(id = createRes.getAccount.id, money = 10000)
+      val expected = v1.DepositMoneyResponse(
+        Some(
+          v1.Account(
+            id = createRes.getAccount.id,
+            balance = createRes.getAccount.balance + 10000
+          )
+        )
+      )
+
+      val res = service.depositMoney(req, md).futureValue
+
+      res mustBe expected
+    }
+
+    "OK: bobが口座に預け入れできる" in {
+      val datastore = TrieMap(
+        Id[Account]("1") -> Account(id = Id[Account]("1"), balance = Money(1000)),
+        Id[Account]("2") -> Account(id = Id[Account]("2"), balance = Money(999))
+      )
+      val accountRepository = new AccountRepository(datastore)
+      val createAccount     = new CreateAccountInteractor(accountRepository)
+      val getAccount        = new GetAccountInteractor(accountRepository)
+      val depositMoney      = new DepositMoneyInteractor(accountRepository)
+      val withdrawMoney     = new WithdrawMoneyInteractor(accountRepository)
+      val deleteAccount     = new DeleteAccountInteractor(accountRepository)
+      val service = new BankingServiceController(
+        createAccount,
+        getAccount,
+        depositMoney,
+        withdrawMoney,
+        deleteAccount
+      )
+
+      val md  = new MetadataBuilder().addText("principal", "bob").build()
+      val req = v1.DepositMoneyRequest(id = "2", money = 10000)
+      val expected = v1.DepositMoneyResponse(
+        Some(
+          v1.Account(
+            id = "2",
+            balance = 10999
+          )
+        )
+      )
+
+      val res = service.depositMoney(req, md).futureValue
+
+      res mustBe expected
+    }
+
+    "OK: aliceが口座に1未満の金額を預け入れできない" in {
+      val datastore = TrieMap(
+        Id[Account]("1") -> Account(id = Id[Account]("1"), balance = Money(1000)),
+        Id[Account]("2") -> Account(id = Id[Account]("2"), balance = Money(999))
+      )
+      val accountRepository = new AccountRepository(datastore)
+      val createAccount     = new CreateAccountInteractor(accountRepository)
+      val getAccount        = new GetAccountInteractor(accountRepository)
+      val depositMoney      = new DepositMoneyInteractor(accountRepository)
+      val withdrawMoney     = new WithdrawMoneyInteractor(accountRepository)
+      val deleteAccount     = new DeleteAccountInteractor(accountRepository)
+      val service = new BankingServiceController(
+        createAccount,
+        getAccount,
+        depositMoney,
+        withdrawMoney,
+        deleteAccount
+      )
+
+      val md  = new MetadataBuilder().addText("principal", "alice").build()
+      val req = v1.DepositMoneyRequest(id = "1", money = 0)
+      val expected = v1.DepositMoneyResponse(
+        Some(
+          v1.Account(
+            id = "1",
+            balance = 11000
+          )
+        )
+      )
+
+      val res = service.depositMoney(req, md).futureValue
+
+      res mustBe expected
+    }
+
+    "KO: bobがaliceの口座に預け入れできない" in {
+      val datastore = TrieMap(
+        Id[Account]("1") -> Account(id = Id[Account]("1"), balance = Money(1000)),
+        Id[Account]("2") -> Account(id = Id[Account]("2"), balance = Money(999))
+      )
+      val accountRepository = new AccountRepository(datastore)
+      val createAccount     = new CreateAccountInteractor(accountRepository)
+      val getAccount        = new GetAccountInteractor(accountRepository)
+      val depositMoney      = new DepositMoneyInteractor(accountRepository)
+      val withdrawMoney     = new WithdrawMoneyInteractor(accountRepository)
+      val deleteAccount     = new DeleteAccountInteractor(accountRepository)
+      val service = new BankingServiceController(
+        createAccount,
+        getAccount,
+        depositMoney,
+        withdrawMoney,
+        deleteAccount
+      )
+
+      val md       = new MetadataBuilder().addText("principal", "bob").build()
+      val req      = v1.DepositMoneyRequest(id = "1", money = 10000)
+      val expected = UnauthorizedError("認可に失敗しました: bob の Set(2) に Set(1) が含まれていない")
+
+      val e = service.depositMoney(req, md).failed.futureValue
+      e mustBe expected
+    }
+
+    "KO: bobがaliceの作成した口座に預け入れできない" in {
+      val datastore = TrieMap(
+        Id[Account]("1") -> Account(id = Id[Account]("1"), balance = Money(1000)),
+        Id[Account]("2") -> Account(id = Id[Account]("2"), balance = Money(999))
+      )
+      val accountRepository = new AccountRepository(datastore)
+      val createAccount     = new CreateAccountInteractor(accountRepository)
+      val getAccount        = new GetAccountInteractor(accountRepository)
+      val depositMoney      = new DepositMoneyInteractor(accountRepository)
+      val withdrawMoney     = new WithdrawMoneyInteractor(accountRepository)
+      val deleteAccount     = new DeleteAccountInteractor(accountRepository)
+      val service = new BankingServiceController(
+        createAccount,
+        getAccount,
+        depositMoney,
+        withdrawMoney,
+        deleteAccount
+      )
+
+      val md = new MetadataBuilder().addText("principal", "bob").build()
+
+      // created
+      val createRes = service
+        .createAccount(v1.CreateAccountRequest(), new MetadataBuilder().addText("principal", "alice").build())
+        .futureValue
+
+      val req      = v1.DepositMoneyRequest(id = createRes.getAccount.id, money = 10000)
+      val expected = UnauthorizedError(s"認可に失敗しました: bob の Set(2) に Set(${createRes.getAccount.id}) が含まれていない")
+
+      val e = service.depositMoney(req, md).failed.futureValue
+      e mustBe expected
+    }
+
+  }
+
+  "#deleteAccount" - {
+    "OK: aliceが口座を削除できる" in {
+      val datastore = TrieMap(
+        Id[Account]("1") -> Account(id = Id[Account]("1"), balance = Money(1000)),
+        Id[Account]("2") -> Account(id = Id[Account]("2"), balance = Money(999))
+      )
+      val accountRepository = new AccountRepository(datastore)
+      val createAccount     = new CreateAccountInteractor(accountRepository)
+      val getAccount        = new GetAccountInteractor(accountRepository)
+      val depositMoney      = new DepositMoneyInteractor(accountRepository)
+      val withdrawMoney     = new WithdrawMoneyInteractor(accountRepository)
+      val deleteAccount     = new DeleteAccountInteractor(accountRepository)
+      val service = new BankingServiceController(
+        createAccount,
+        getAccount,
+        depositMoney,
+        withdrawMoney,
+        deleteAccount
+      )
+
+      val md       = new MetadataBuilder().addText("principal", "alice").build()
+      val req      = v1.DeleteAccountRequest(id = "1")
+      val expected = v1.DeleteAccountResponse()
+
+      val res = service.deleteAccount(req, md).futureValue
+
+      res mustBe expected
+    }
+
+    "OK: aliceが作成した口座を削除できる" in {
+      val datastore = TrieMap(
+        Id[Account]("1") -> Account(id = Id[Account]("1"), balance = Money(1000)),
+        Id[Account]("2") -> Account(id = Id[Account]("2"), balance = Money(999))
+      )
+      val accountRepository = new AccountRepository(datastore)
+      val createAccount     = new CreateAccountInteractor(accountRepository)
+      val getAccount        = new GetAccountInteractor(accountRepository)
+      val depositMoney      = new DepositMoneyInteractor(accountRepository)
+      val withdrawMoney     = new WithdrawMoneyInteractor(accountRepository)
+      val deleteAccount     = new DeleteAccountInteractor(accountRepository)
+      val service = new BankingServiceController(
+        createAccount,
+        getAccount,
+        depositMoney,
+        withdrawMoney,
+        deleteAccount
+      )
+
+      val md = new MetadataBuilder().addText("principal", "alice").build()
+
+      // created
+      val createRes = service.createAccount(v1.CreateAccountRequest(), md).futureValue
+
+      val req      = v1.DeleteAccountRequest(id = createRes.getAccount.id)
+      val expected = v1.DeleteAccountResponse()
+
+      val res = service.deleteAccount(req, md).futureValue
+
+      res mustBe expected
+    }
+
+    "OK: bobが口座を削除できる" in {
+      val datastore = TrieMap(
+        Id[Account]("1") -> Account(id = Id[Account]("1"), balance = Money(1000)),
+        Id[Account]("2") -> Account(id = Id[Account]("2"), balance = Money(999))
+      )
+      val accountRepository = new AccountRepository(datastore)
+      val createAccount     = new CreateAccountInteractor(accountRepository)
+      val getAccount        = new GetAccountInteractor(accountRepository)
+      val depositMoney      = new DepositMoneyInteractor(accountRepository)
+      val withdrawMoney     = new WithdrawMoneyInteractor(accountRepository)
+      val deleteAccount     = new DeleteAccountInteractor(accountRepository)
+      val service = new BankingServiceController(
+        createAccount,
+        getAccount,
+        depositMoney,
+        withdrawMoney,
+        deleteAccount
+      )
+
+      val md       = new MetadataBuilder().addText("principal", "bob").build()
+      val req      = v1.DeleteAccountRequest(id = "2")
+      val expected = v1.DeleteAccountResponse()
+
+      val res = service.deleteAccount(req, md).futureValue
+
+      res mustBe expected
+    }
+
+    "KO: bobがaliceの口座を削除できない" in {
+      val datastore = TrieMap(
+        Id[Account]("1") -> Account(id = Id[Account]("1"), balance = Money(1000)),
+        Id[Account]("2") -> Account(id = Id[Account]("2"), balance = Money(999))
+      )
+      val accountRepository = new AccountRepository(datastore)
+      val createAccount     = new CreateAccountInteractor(accountRepository)
+      val getAccount        = new GetAccountInteractor(accountRepository)
+      val depositMoney      = new DepositMoneyInteractor(accountRepository)
+      val withdrawMoney     = new WithdrawMoneyInteractor(accountRepository)
+      val deleteAccount     = new DeleteAccountInteractor(accountRepository)
+      val service = new BankingServiceController(
+        createAccount,
+        getAccount,
+        depositMoney,
+        withdrawMoney,
+        deleteAccount
+      )
+
+      val md       = new MetadataBuilder().addText("principal", "bob").build()
+      val req      = v1.DeleteAccountRequest(id = "1")
+      val expected = UnauthorizedError("認可に失敗しました: bob の Set(2) に Set(1) が含まれていない")
+
+      val e = service.deleteAccount(req, md).failed.futureValue
+      e mustBe expected
+    }
+
+    "KO: bobがaliceの作成した口座を削除できない" in {
+      val datastore = TrieMap(
+        Id[Account]("1") -> Account(id = Id[Account]("1"), balance = Money(1000)),
+        Id[Account]("2") -> Account(id = Id[Account]("2"), balance = Money(999))
+      )
+      val accountRepository = new AccountRepository(datastore)
+      val createAccount     = new CreateAccountInteractor(accountRepository)
+      val getAccount        = new GetAccountInteractor(accountRepository)
+      val depositMoney      = new DepositMoneyInteractor(accountRepository)
+      val withdrawMoney     = new WithdrawMoneyInteractor(accountRepository)
+      val deleteAccount     = new DeleteAccountInteractor(accountRepository)
+      val service = new BankingServiceController(
+        createAccount,
+        getAccount,
+        depositMoney,
+        withdrawMoney,
+        deleteAccount
+      )
+
+      val md = new MetadataBuilder().addText("principal", "bob").build()
+
+      // created
+      val createRes = service
+        .createAccount(v1.CreateAccountRequest(), new MetadataBuilder().addText("principal", "alice").build())
+        .futureValue
+
+      val req      = v1.DeleteAccountRequest(id = createRes.getAccount.id)
+      val expected = UnauthorizedError(s"認可に失敗しました: bob の Set(2) に Set(${createRes.getAccount.id}) が含まれていない")
+
+      val e = service.deleteAccount(req, md).failed.futureValue
+      e mustBe expected
+    }
+
+  }
 }

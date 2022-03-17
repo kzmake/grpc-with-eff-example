@@ -1,4 +1,5 @@
 import Settings._
+import scalapb.GeneratorOption.FlatPackage
 
 val baseName = "grpcinscala"
 
@@ -17,6 +18,11 @@ lazy val api = (project in file("api"))
   .settings(name := "api")
   .settings(protoSettings)
   .settings(Compile / akkaGrpcCodeGeneratorSettings += "server_power_apis")
+  .settings(
+    Compile / PB.targets += scalapb.validate.gen(
+      FlatPackage
+    ) -> (Compile / akkaGrpcCodeGeneratorSettings / target).value
+  )
   .settings(Compile / akkaGrpcGeneratedSources := Seq(AkkaGrpc.Client, AkkaGrpc.Server))
   .settings(Compile / PB.protoSources += file("api/banking"))
 

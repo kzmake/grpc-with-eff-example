@@ -4,11 +4,14 @@ import api.banking.v1._
 import adapter.eff.Stack._
 import adapter.secondary.map.MapAuthzOps.AuthzOps
 import adapter.secondary.uuid.UUIDIdGenOps.IdGenOps
+import akka.grpc.GrpcServiceException
 import akka.grpc.scaladsl.Metadata
 import org.atnos.eff.syntax.all._
 import usecase.interactor._
 import usecase.port.Port
 import domain.error.MyError
+import io.grpc.Status
+import scalapb.validate.{Success, Failure, Validator}
 
 import scala.concurrent.Future
 
@@ -73,6 +76,13 @@ class BankingServiceController(
   }
 
   override def depositMoney(req: DepositMoneyRequest, metadata: Metadata): Future[DepositMoneyResponse] = {
+    Validator[DepositMoneyRequest].validate(req) match {
+      case Success => println("Success!")
+      case Failure(violations) =>
+        Future.failed(
+          new GrpcServiceException(Status.INVALID_ARGUMENT.withDescription("Invalid"))
+        )
+    }
     val principal = metadata.getText("principal").getOrElse("none")
     val in        = DepositMoneyInputData(id = req.id, money = req.money)
     val out = depositMoneyPort

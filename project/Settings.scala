@@ -1,5 +1,8 @@
+import akka.grpc.sbt.AkkaGrpcPlugin.autoImport.akkaGrpcCodeGeneratorSettings
 import sbt._
 import sbt.Keys._
+import sbtprotoc.ProtocPlugin.autoImport.PB
+import scalapb.GeneratorOption._
 
 object Settings {
   val coreSettings: Def.SettingsDefinition = Seq(
@@ -26,7 +29,8 @@ object Settings {
 
   val protoSettings: Def.SettingsDefinition = Seq(
     libraryDependencies ++= Seq(
-      GoogleApiGrpc.common % "protobuf-src" intransitive ()
+      "com.thesamet.scalapb" %% "scalapb-validate-core" % scalapb.validate.compiler.BuildInfo.version % "protobuf",
+      GoogleApiGrpc.common    % "protobuf-src" intransitive ()
     )
   )
 
