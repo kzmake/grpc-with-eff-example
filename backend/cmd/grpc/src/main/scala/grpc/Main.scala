@@ -12,7 +12,6 @@ import akka.actor.typed.ActorSystem
 import akka.actor.typed.scaladsl.Behaviors
 import com.typesafe.config.ConfigFactory
 import com.typesafe.config.Config
-import domain.account
 import domain.account._
 import domain.shared.Id
 import usecase.interactor._
@@ -33,6 +32,14 @@ object Main {
       Id[Account]("11111111-1111-1111-1111-111111111111") -> Account(
         Id[Account]("11111111-1111-1111-1111-111111111111"),
         Money(1000)
+      ),
+      Id[Account]("1") -> Account(
+        Id[Account]("1"),
+        Money(1234)
+      ),
+      Id[Account]("2") -> Account(
+        Id[Account]("2"),
+        Money(4321)
       )
     )
     val accountRepository       = new AccountRepository(datastore)
