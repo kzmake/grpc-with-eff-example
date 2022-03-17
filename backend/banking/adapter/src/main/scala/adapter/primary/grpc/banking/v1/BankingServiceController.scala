@@ -11,7 +11,7 @@ import usecase.interactor._
 import usecase.port.Port
 import domain.error.MyError
 import io.grpc.Status
-import scalapb.validate.{Success, Failure, Validator}
+import scalapb.validate._
 
 import scala.concurrent.Future
 
@@ -23,6 +23,14 @@ class BankingServiceController(
     val deleteAccountPort: Port[DeleteAccountInputData, DeleteAccountOutputData]
 ) extends BankingServicePowerApi {
   override def createAccount(req: CreateAccountRequest, metadata: Metadata): Future[CreateAccountResponse] = {
+    Validator[CreateAccountRequest].validate(req) match {
+      case Success =>
+      case Failure(violations) =>
+        throw new GrpcServiceException(
+          Status.INVALID_ARGUMENT.withDescription(violations.mkString(": "))
+        )
+    }
+
     val principal = metadata.getText("principal").getOrElse("none")
     val in        = CreateAccountInputData()
 
@@ -50,6 +58,14 @@ class BankingServiceController(
   }
 
   override def getAccount(req: GetAccountRequest, metadata: Metadata): Future[GetAccountResponse] = {
+    Validator[GetAccountRequest].validate(req) match {
+      case Success =>
+      case Failure(violations) =>
+        throw new GrpcServiceException(
+          Status.INVALID_ARGUMENT.withDescription(violations.mkString(": "))
+        )
+    }
+
     val principal = metadata.getText("principal").getOrElse("none")
     val in        = GetAccountInputData(id = req.id)
     val out = getAccountPort
@@ -77,12 +93,13 @@ class BankingServiceController(
 
   override def depositMoney(req: DepositMoneyRequest, metadata: Metadata): Future[DepositMoneyResponse] = {
     Validator[DepositMoneyRequest].validate(req) match {
-      case Success => println("Success!")
+      case Success =>
       case Failure(violations) =>
-        Future.failed(
-          new GrpcServiceException(Status.INVALID_ARGUMENT.withDescription("Invalid"))
+        throw new GrpcServiceException(
+          Status.INVALID_ARGUMENT.withDescription(violations.mkString(": "))
         )
     }
+
     val principal = metadata.getText("principal").getOrElse("none")
     val in        = DepositMoneyInputData(id = req.id, money = req.money)
     val out = depositMoneyPort
@@ -109,6 +126,14 @@ class BankingServiceController(
   }
 
   override def withdrawMoney(req: WithdrawMoneyRequest, metadata: Metadata): Future[WithdrawMoneyResponse] = {
+    Validator[WithdrawMoneyRequest].validate(req) match {
+      case Success =>
+      case Failure(violations) =>
+        throw new GrpcServiceException(
+          Status.INVALID_ARGUMENT.withDescription(violations.mkString(": "))
+        )
+    }
+
     val principal = metadata.getText("principal").getOrElse("none")
     val in        = WithdrawMoneyInputData(id = req.id, money = req.money)
     val out = withdrawMoneyPort
@@ -135,6 +160,14 @@ class BankingServiceController(
   }
 
   override def deleteAccount(req: DeleteAccountRequest, metadata: Metadata): Future[DeleteAccountResponse] = {
+    Validator[DeleteAccountRequest].validate(req) match {
+      case Success =>
+      case Failure(violations) =>
+        throw new GrpcServiceException(
+          Status.INVALID_ARGUMENT.withDescription(violations.mkString(": "))
+        )
+    }
+
     val principal = metadata.getText("principal").getOrElse("none")
     val in        = DeleteAccountInputData(id = req.id)
     val out = deleteAccountPort

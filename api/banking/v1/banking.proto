@@ -50,14 +50,14 @@ message CreateAccountResponse {
 }
 
 message GetAccountRequest {
-  string id = 1;
+  string id = 1 [(validate.rules).string.min_len = 1];
 }
 message GetAccountResponse {
   Account account = 1;
 }
 
 message DepositMoneyRequest {
-  string id = 1;
+  string id = 1 [(validate.rules).string.min_len = 1];
   uint64 money = 2 [(validate.rules).uint64 = { gte: 1,  lte: 500000 }];
 }
 message DepositMoneyResponse {
@@ -65,15 +65,15 @@ message DepositMoneyResponse {
 }
 
 message WithdrawMoneyRequest {
-  string id = 1;
-  uint64 money = 2;
+  string id = 1 [(validate.rules).string.min_len = 1];
+  uint64 money = 2 [(validate.rules).uint64 = { gte: 1,  lte: 500000 }];
 }
 message WithdrawMoneyResponse {
   Account account = 1;
 }
 
 message DeleteAccountRequest {
-  string id = 1;
+  string id = 1 [(validate.rules).string.min_len = 1];
 }
 message DeleteAccountResponse {
 }

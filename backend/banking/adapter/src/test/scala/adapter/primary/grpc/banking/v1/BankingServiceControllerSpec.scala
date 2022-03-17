@@ -334,41 +334,6 @@ class BankingServiceControllerSpec extends AnyFreeSpec {
       res mustBe expected
     }
 
-    "OK: aliceが口座に1未満の金額を預け入れできない" in {
-      val datastore = TrieMap(
-        Id[Account]("1") -> Account(id = Id[Account]("1"), balance = Money(1000)),
-        Id[Account]("2") -> Account(id = Id[Account]("2"), balance = Money(999))
-      )
-      val accountRepository = new AccountRepository(datastore)
-      val createAccount     = new CreateAccountInteractor(accountRepository)
-      val getAccount        = new GetAccountInteractor(accountRepository)
-      val depositMoney      = new DepositMoneyInteractor(accountRepository)
-      val withdrawMoney     = new WithdrawMoneyInteractor(accountRepository)
-      val deleteAccount     = new DeleteAccountInteractor(accountRepository)
-      val service = new BankingServiceController(
-        createAccount,
-        getAccount,
-        depositMoney,
-        withdrawMoney,
-        deleteAccount
-      )
-
-      val md  = new MetadataBuilder().addText("principal", "alice").build()
-      val req = v1.DepositMoneyRequest(id = "1", money = 0)
-      val expected = v1.DepositMoneyResponse(
-        Some(
-          v1.Account(
-            id = "1",
-            balance = 11000
-          )
-        )
-      )
-
-      val res = service.depositMoney(req, md).futureValue
-
-      res mustBe expected
-    }
-
     "KO: bobがaliceの口座に預け入れできない" in {
       val datastore = TrieMap(
         Id[Account]("1") -> Account(id = Id[Account]("1"), balance = Money(1000)),
