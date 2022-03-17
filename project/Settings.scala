@@ -20,7 +20,6 @@ object Settings {
       Logstash.logbackEncoder,
       Jackson.scala,
       Eff.core,
-      Cats.core,
       ScalaTest.core % Test
     )
   )
@@ -31,9 +30,10 @@ object Settings {
     )
   )
 
-  val infrastructureSettings: Def.SettingsDefinition = Seq(
+  val adapterSettings: Def.SettingsDefinition = Seq(
     libraryDependencies ++= Seq(
       AkkaHttp.http,
+      AkkaHttp.core,
       AkkaHttp.http2Support,
       Akka.actorTyped,
       Akka.stream,

@@ -13,7 +13,8 @@ import scala.collection.concurrent.TrieMap
 object MapAuthzOps extends AuthzInterpreter {
   private val scopesStore = TrieMap.empty[String, Set[String]]
   private val policiesStore = TrieMap(
-    "alice" -> Set("1"),
+    "none"  -> Set.empty[String],
+    "alice" -> Set("1", "11111111-1111-1111-1111-111111111111"),
     "bob"   -> Set("2")
   )
 
@@ -49,12 +50,14 @@ object MapAuthzOps extends AuthzInterpreter {
           case Authorize(principal) =>
             for {
               _ <- {
-                val scopes   = scopesStore.getOrElse("required", Set.empty)
-                val policies = policiesStore.getOrElse(principal, Set.empty)
-                if (scopes.forall(policies.contains))
+                val scopes   = scopesStore.getOrElse("required", Set.empty[String])
+                val policies = policiesStore.getOrElse(principal, Set.empty[String])
+                if (scopes.forall(s => policies.contains(s)))
                   fromEither[U, MyError, Unit](Right(()))
                 else
-                  fromEither[U, MyError, X](Left(UnauthorizedError(s"認可に失敗しました: $policies に $scopes が含まれていない")))
+                  fromEither[U, MyError, X](
+                    Left(UnauthorizedError(s"認可に失敗しました: $principal の $policies に $scopes が含まれていない"))
+                  )
               }
               _ = scopesStore += ("required" -> Set.empty)
             } yield ().asInstanceOf[X]

@@ -17,7 +17,7 @@ class BankingServiceController(
     val getAccount: Port[GetAccountInputData, GetAccountOutputData]
 ) extends BankingServicePowerApi {
   override def createAccount(req: CreateAccountRequest, metadata: Metadata): Future[CreateAccountResponse] = {
-    val principal = metadata.getText("principal").getOrElse("")
+    val principal = metadata.getText("principal").getOrElse("none")
     val in        = CreateAccountInputData()
 
     val out = createAccount
@@ -44,7 +44,7 @@ class BankingServiceController(
   }
 
   override def getAccount(req: GetAccountRequest, metadata: Metadata): Future[GetAccountResponse] = {
-    val principal = metadata.getText("principal").getOrElse("")
+    val principal = metadata.getText("principal").getOrElse("none")
     val in        = GetAccountInputData(id = req.id)
     val out = getAccount
       .execute[AStack](in)

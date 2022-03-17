@@ -18,8 +18,9 @@ import (
 	"golang.org/x/sync/errgroup"
 	"golang.org/x/xerrors"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/metadata"
 
-	timepb "github.com/kzmake/_idempotency-key/gen/go/time/v1"
+	pb "github.com/kzmake/grpcinscala/gen/go/banking/v1"
 )
 
 type Env struct {
@@ -55,14 +56,19 @@ func newGateway(ctx context.Context) (*http.Server, error) {
 				Str("ip", c.ClientIP()).
 				Dur("latency", latency).
 				Str("user_agent", c.Request.UserAgent()).
+				Str("principal", c.Request.Header.Get("principal")).
 				Logger()
 		}),
 		ginlogger.WithSkipPath([]string{"/healthz"}),
 	))
 	r.Use(gin.Recovery())
 
-	mux := runtime.NewServeMux()
-	if err := timepb.RegisterTimeHandlerFromEndpoint(ctx, mux, env.ServiceAddress, []grpc.DialOption{grpc.WithInsecure()}); err != nil {
+	mux := runtime.NewServeMux(
+		runtime.WithMetadata(func(_ context.Context, r *http.Request) metadata.MD {
+			return metadata.Pairs("principal", r.Header.Get("principal"))
+		}),
+	)
+	if err := pb.RegisterBankingServiceHandlerFromEndpoint(ctx, mux, env.ServiceAddress, []grpc.DialOption{grpc.WithInsecure()}); err != nil {
 		return nil, xerrors.Errorf("Failed to register handler: %w", err)
 	}
 	r.Any("/*anypath", gin.WrapH(mux))
