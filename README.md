@@ -7,7 +7,7 @@
 下記のみなさんの発表で取り上げられているエッセンスを、@kzmakeの解釈のもとgRPCアプリケーションとして実装したサンプルとなります。
 
 - [Scalaで始める表明プログラミング](https://speakerdeck.com/dnskimo/scaladeshi-merubiao-ming-puroguramingu) by @dnskimo
-- [Eff（atnos-eff）による実践的なコーディング集](https://speakerdeck.com/shiroichi315/eff-atnos-eff-niyorushi-jian-de-nakodeinguji) by @kushiro
+- [Eff（atnos-eff）による実践的なコーディング集](https://speakerdeck.com/shiroichi315/eff-atnos-eff-niyorushi-jian-de-nakodeinguji) by @shiroichi315
 - [AlpのEff独自Effect集](https://scalamatsuri.org/ja/proposals/J1647668100) by @ma2k8
 
 > ⚠ 当コードは架空のサービスを想定したものであり、所属先とは全く関係がありません。
@@ -140,5 +140,5 @@ Content-Length: 74
 - https://docs.buf.build/introduction
 - https://scalapb.github.io/docs/validation/
 - [Scalaで始める表明プログラミング](https://speakerdeck.com/dnskimo/scaladeshi-merubiao-ming-puroguramingu) by @dnskimo
-- [Eff（atnos-eff）による実践的なコーディング集](https://speakerdeck.com/shiroichi315/eff-atnos-eff-niyorushi-jian-de-nakodeinguji) by @kushiro
+- [Eff（atnos-eff）による実践的なコーディング集](https://speakerdeck.com/shiroichi315/eff-atnos-eff-niyorushi-jian-de-nakodeinguji) by @shiroichi315
 - [AlpのEff独自Effect集](https://scalamatsuri.org/ja/proposals/J1647668100) by @ma2k8
