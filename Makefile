@@ -9,11 +9,13 @@ api:
 
 .PHONY: build
 build:
-	skaffold build
+	echo まだ用意してないよ
+	# skaffold build
 
 .PHONY: dev
 dev:
-	skaffold dev
+	echo まだ用意してないよ
+	# skaffold dev
 
 .PHONY: http
 http:
