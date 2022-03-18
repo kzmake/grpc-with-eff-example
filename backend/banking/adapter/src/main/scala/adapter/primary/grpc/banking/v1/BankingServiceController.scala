@@ -1,6 +1,6 @@
 package adapter.primary.grpc.banking.v1
 
-import api.banking.v1._
+import api.banking._
 import adapter.eff.Stack._
 import adapter.secondary.map.MapAuthzOps.AuthzOps
 import adapter.secondary.uuid.UUIDIdGenOps.IdGenOps
@@ -21,9 +21,9 @@ class BankingServiceController(
     val depositMoneyPort: Port[DepositMoneyInputData, DepositMoneyOutputData],
     val withdrawMoneyPort: Port[WithdrawMoneyInputData, WithdrawMoneyOutputData],
     val deleteAccountPort: Port[DeleteAccountInputData, DeleteAccountOutputData]
-) extends BankingServicePowerApi {
-  override def createAccount(req: CreateAccountRequest, metadata: Metadata): Future[CreateAccountResponse] = {
-    Validator[CreateAccountRequest].validate(req) match {
+) extends v1.BankingServicePowerApi {
+  override def createAccount(req: v1.CreateAccountRequest, metadata: Metadata): Future[v1.CreateAccountResponse] = {
+    Validator[v1.CreateAccountRequest].validate(req) match {
       case Success =>
       case Failure(violations) =>
         throw new GrpcServiceException(
@@ -44,9 +44,9 @@ class BankingServiceController(
     out match {
       case Right(v) =>
         Future.successful(
-          CreateAccountResponse(
+          v1.CreateAccountResponse(
             Some(
-              Account(
+              v1.Account(
                 id = v.payload.id.value,
                 balance = v.payload.balance.value
               )
@@ -57,8 +57,8 @@ class BankingServiceController(
     }
   }
 
-  override def getAccount(req: GetAccountRequest, metadata: Metadata): Future[GetAccountResponse] = {
-    Validator[GetAccountRequest].validate(req) match {
+  override def getAccount(req: v1.GetAccountRequest, metadata: Metadata): Future[v1.GetAccountResponse] = {
+    Validator[v1.GetAccountRequest].validate(req) match {
       case Success =>
       case Failure(violations) =>
         throw new GrpcServiceException(
@@ -78,9 +78,9 @@ class BankingServiceController(
     out match {
       case Right(v) =>
         Future.successful(
-          GetAccountResponse(
+          v1.GetAccountResponse(
             Some(
-              Account(
+              v1.Account(
                 id = v.payload.id.value,
                 balance = v.payload.balance.value
               )
@@ -91,8 +91,8 @@ class BankingServiceController(
     }
   }
 
-  override def depositMoney(req: DepositMoneyRequest, metadata: Metadata): Future[DepositMoneyResponse] = {
-    Validator[DepositMoneyRequest].validate(req) match {
+  override def depositMoney(req: v1.DepositMoneyRequest, metadata: Metadata): Future[v1.DepositMoneyResponse] = {
+    Validator[v1.DepositMoneyRequest].validate(req) match {
       case Success =>
       case Failure(violations) =>
         throw new GrpcServiceException(
@@ -112,9 +112,9 @@ class BankingServiceController(
     out match {
       case Right(v) =>
         Future.successful(
-          DepositMoneyResponse(
+          v1.DepositMoneyResponse(
             Some(
-              Account(
+              v1.Account(
                 id = v.payload.id.value,
                 balance = v.payload.balance.value
               )
@@ -125,8 +125,8 @@ class BankingServiceController(
     }
   }
 
-  override def withdrawMoney(req: WithdrawMoneyRequest, metadata: Metadata): Future[WithdrawMoneyResponse] = {
-    Validator[WithdrawMoneyRequest].validate(req) match {
+  override def withdrawMoney(req: v1.WithdrawMoneyRequest, metadata: Metadata): Future[v1.WithdrawMoneyResponse] = {
+    Validator[v1.WithdrawMoneyRequest].validate(req) match {
       case Success =>
       case Failure(violations) =>
         throw new GrpcServiceException(
@@ -146,9 +146,9 @@ class BankingServiceController(
     out match {
       case Right(v) =>
         Future.successful(
-          WithdrawMoneyResponse(
+          v1.WithdrawMoneyResponse(
             Some(
-              Account(
+              v1.Account(
                 id = v.payload.id.value,
                 balance = v.payload.balance.value
               )
@@ -159,8 +159,8 @@ class BankingServiceController(
     }
   }
 
-  override def deleteAccount(req: DeleteAccountRequest, metadata: Metadata): Future[DeleteAccountResponse] = {
-    Validator[DeleteAccountRequest].validate(req) match {
+  override def deleteAccount(req: v1.DeleteAccountRequest, metadata: Metadata): Future[v1.DeleteAccountResponse] = {
+    Validator[v1.DeleteAccountRequest].validate(req) match {
       case Success =>
       case Failure(violations) =>
         throw new GrpcServiceException(
@@ -178,7 +178,7 @@ class BankingServiceController(
       .run
 
     out match {
-      case Right(v) => Future.successful(DeleteAccountResponse())
+      case Right(v) => Future.successful(v1.DeleteAccountResponse())
       case Left(e)  => Future.failed(e)
     }
   }
