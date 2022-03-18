@@ -14,7 +14,7 @@ dev:
 
 .PHONY: gateway
 gateway:
-	go run backend/banking/gateway/main.go
+	go run backend/cmd/gateway/main.go
 
 .PHONY: service
 service:
