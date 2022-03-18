@@ -1,5 +1,5 @@
 package domain.base
 
-trait Identifier extends ValueObject {
+trait EntityId extends ValueObject {
   val value: String
 }
