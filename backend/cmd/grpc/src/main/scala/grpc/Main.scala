@@ -25,7 +25,7 @@ object Main {
     val conf: Config = ConfigFactory
       .parseString("akka.http.server.preview.enable-http2 = on")
       .withFallback(ConfigFactory.defaultApplication())
-    implicit val sys: ActorSystem[Nothing] = ActorSystem[Nothing](Behaviors.empty, "kzmake_banking", conf)
+    implicit val sys: ActorSystem[Nothing] = ActorSystem[Nothing](Behaviors.empty, "banking", conf)
     implicit val ec: ExecutionContext      = sys.executionContext
 
     val datastore = TrieMap(
