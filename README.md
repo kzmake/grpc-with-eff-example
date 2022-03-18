@@ -4,7 +4,7 @@
 
 [ScalaMatsuri2022](https://scalamatsuri.org/ja)にてgRPCアプリケーションをライブコーディングするための課題プロジェクトです。
 
-下記のみなさんの発表で取り上げられているエッセンスを、実際のgRPCアプリケーションとしてのサンプル実装となります。
+下記のみなさんの発表で取り上げられているエッセンスを、@kzmakeの解釈のもとgRPCアプリケーションとして実装したサンプルとなります。
 
 - [Scalaで始める表明プログラミング](https://speakerdeck.com/dnskimo/scaladeshi-merubiao-ming-puroguramingu) by @dnskimo
 - [Eff（atnos-eff）による実践的なコーディング集](https://speakerdeck.com/shiroichi315/eff-atnos-eff-niyorushi-jian-de-nakodeinguji) by @kushiro
@@ -66,6 +66,7 @@ final case class Account(id: Id[Account], balance: Money) extends AggregateRoot[
 
 ```bash
 $ tree
+.
 ├── api
 │   ├── banking/v1/banking.proto # 提供する api(grpc) の定義
 │   └── gen
@@ -77,17 +78,22 @@ $ tree
     │   ├── domain               # ドメイン層
     │   ├── usercase             # ユースケース層
     │   ├── adapter              # アダプター層
-    │   └── gateway              # json api -> grpc な受け口を提供する grpc-gateway (golang)
     │
-    └── cmd # アプリケーションのエントリーポイント
-        └── grpc # gateway用のgolangコード  
+    └── cmd                      # アプリケーションのエントリーポイント
+        ├── grpc                 # 銀行口座サービス
+        └── gateway              # json api を提供する grpc-gateway
 ```
 
 ### APIについて
 
-buf.build を用いて、
+buf.build / akka-grpc(scalapb) を用いて、
 
-- openapiv2 の json 
+- [API仕様(openapiv2)](https://github.com/kzmake/grpcinscala/blob/main/api/gen/openapiv2/banking/v1/banking.swagger.json): buf generate実行時
+- [gatewayのためのコード(golang + grpc-gateway)](https://github.com/kzmake/grpcinscala/tree/main/api/gen/go/banking/v1): buf generate実行時
+- [bankingのためのコード(scala)](https://doc.akka.io/docs/akka-grpc/current/overview.html): sbt compile実行時
+- [バリデーションコード(protoc-gen-validate with scalapb)](https://scalapb.github.io/docs/validation/): sbt compile実行時
+
+を生成しています。
 
 ### 設計について
 
@@ -124,3 +130,15 @@ Content-Length: 74
 
 {"account":{"id":"11111111-1111-1111-1111-111111111111","balance":"1200"}}
 ```
+
+## 参考
+
+- https://github.com/atnos-org/eff
+- https://atnos-org.github.io/eff/
+- https://www.exoego.net/eff/
+- https://doc.akka.io/docs/akka-grpc/current/overview.html
+- https://docs.buf.build/introduction
+- https://scalapb.github.io/docs/validation/
+- [Scalaで始める表明プログラミング](https://speakerdeck.com/dnskimo/scaladeshi-merubiao-ming-puroguramingu) by @dnskimo
+- [Eff（atnos-eff）による実践的なコーディング集](https://speakerdeck.com/shiroichi315/eff-atnos-eff-niyorushi-jian-de-nakodeinguji) by @kushiro
+- [AlpのEff独自Effect集](https://scalamatsuri.org/ja/proposals/J1647668100) by @ma2k8
