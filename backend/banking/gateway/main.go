@@ -20,7 +20,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 
-	pb "github.com/kzmake/grpcinscala/gen/go/banking/v1"
+	pb "github.com/kzmake/grpcinscala/api/gen/go/banking/v1"
 )
 
 type Env struct {

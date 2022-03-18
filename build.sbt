@@ -14,8 +14,8 @@ ThisBuild / scalacOptions ++= Seq(
 )
 
 lazy val api = (project in file("api"))
-  .enablePlugins(AkkaGrpcPlugin)
   .settings(name := "api")
+  .enablePlugins(AkkaGrpcPlugin)
   .settings(protoSettings)
   .settings(Compile / akkaGrpcCodeGeneratorSettings += "server_power_apis")
   .settings(
@@ -42,5 +42,9 @@ lazy val bankingCtxAdapter = (project in file("backend/banking/adapter"))
 
 lazy val grpc = (project in file("backend/cmd/grpc"))
   .settings(name := s"${baseName}-grpc")
+  .enablePlugins(JavaAgent)
+  .settings(
+    javaAgents += "org.mortbay.jetty.alpn" % "jetty-alpn-agent" % "2.0.10" % "runtime"
+  )
   .settings(adapterSettings, coreSettings)
-  .dependsOn(api, bankingCtxAdapter)
+  .dependsOn(bankingCtxAdapter)

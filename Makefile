@@ -7,15 +7,18 @@ all: api
 api:
 	make -C api all
 
-.PHONY: build
-build:
-	echo まだ用意してないよ
-	# skaffold build
-
 .PHONY: dev
 dev:
-	echo まだ用意してないよ
-	# skaffold dev
+	make gateway &
+	make service
+
+.PHONY: gateway
+gateway:
+	go run backend/banking/gateway/main.go
+
+.PHONY: service
+service:
+	sbt "grpc / run"
 
 .PHONY: http
 http:
@@ -31,11 +34,8 @@ http:
 
 .PHONY: grpc
 grpc:
-	grpcurl -H "principal: alice" \
-		-plaintext localhost:50051 banking.v1.BankingService/CreateAccount
+	grpcurl -H "principal: alice" -plaintext localhost:50051 banking.v1.BankingService/CreateAccount
 	:
-	grpcurl -H "principal: alice" -d '{"id": "11111111-1111-1111-1111-111111111111"}' \
-		-plaintext localhost:50051 banking.v1.BankingService/GetAccount
+	grpcurl -H "principal: alice" -d '{"id": "11111111-1111-1111-1111-111111111111"}' -plaintext localhost:50051 banking.v1.BankingService/GetAccount
 	:
-	grpcurl -H "principal: bob" -d '{"id": "11111111-1111-1111-1111-111111111111"}' \
-		-plaintext localhost:50051 banking.v1.BankingService/GetAccount
+	grpcurl -H "principal: bob" -d '{"id": "11111111-1111-1111-1111-111111111111"}' -plaintext localhost:50051 banking.v1.BankingService/GetAccount
