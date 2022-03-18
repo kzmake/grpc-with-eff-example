@@ -7,7 +7,7 @@ pre:
 
 .PHONY: fmt
 fmt:
-	goimports -l -local "github.com/kzmake/grpcinscala/backend/bankaccount" -w .
+	goimports -l -local "github.com/kzmake/grpc-with-eff-example/backend/bankaccount" -w .
 
 .PHONY: lint
 lint:

@@ -15,7 +15,7 @@
 ## エクササイズとしてコーディングしてみる
 
 ```bash
-git clone -b exercise https://github.com/kzmake/grpcinscala
+git clone -b exercise https://github.com/kzmake/grpc-with-eff-example
 ```
 よりお試しいただけます！
 
@@ -88,8 +88,8 @@ $ tree
 
 buf.build / akka-grpc(scalapb) を用いて、
 
-- [API仕様(openapiv2)](https://github.com/kzmake/grpcinscala/blob/main/api/gen/openapiv2/banking/v1/banking.swagger.json): buf generate実行時
-- [gatewayのためのコード(golang + grpc-gateway)](https://github.com/kzmake/grpcinscala/tree/main/api/gen/go/banking/v1): buf generate実行時
+- [API仕様(openapiv2)](https://github.com/kzmake/grpc-with-eff-example/blob/main/api/gen/openapiv2/banking/v1/banking.swagger.json): buf generate実行時
+- [gatewayのためのコード(golang + grpc-gateway)](https://github.com/kzmake/grpc-with-eff-example/tree/main/api/gen/go/banking/v1): buf generate実行時
 - [bankingのためのコード(scala)](https://doc.akka.io/docs/akka-grpc/current/overview.html): sbt compile実行時
 - [バリデーションコード(protoc-gen-validate with scalapb)](https://scalapb.github.io/docs/validation/): sbt compile実行時
 

@@ -1,4 +1,4 @@
-module github.com/kzmake/grpcinscala
+module github.com/kzmake/grpc-with-eff-example
 
 go 1.17
 
