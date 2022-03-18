@@ -8,18 +8,23 @@ import domain.error._
 import domain.shared.Id
 import org.atnos.eff.Eff
 import org.atnos.eff.all.fromEither
-import org.atnos.eff.syntax.all.toEffPureOps
 
 final case class Account(id: Id[Account], balance: Money) extends AggregateRoot[Account] {
   assert(id.value.nonEmpty, "口座番号は空にならない")
   assert(balance >= Money.zero, "残高が0未満になることはない")
 
-  def deposit[R](money: Money): Eff[R, Account] = {
+  def deposit[R: _myErrorEither](money: Money): Eff[R, Account] = {
     require(Money.zero < money, "預け入れ額は1以上")
-    copy(balance = balance + money).pureEff[R]
+
+    for {
+      // NOTE: ビジネス的な状況にもよるが、ドメイン的に Either[Right, Account] で扱いたい可能性が高いという例でfromEitherしちゃう
+      account <- fromEither[R, MyError, Account](Right(copy(balance = balance + money)))
+    } yield account
   }
+
   def withdraw[R: _myErrorEither](money: Money): Eff[R, Account] = {
     require(Money.zero < money, "引き出し額は1以上")
+
     for {
       account <- fromEither[R, MyError, Account](
         if (money <= this.balance) Right(copy(balance = balance - money))
