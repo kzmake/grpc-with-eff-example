@@ -19,5 +19,5 @@ class GetAccountInteractor(
   } yield GetAccountOutputData(payload = got)
 }
 
-case class GetAccountInputData(id: String)        extends InputData
-case class GetAccountOutputData(payload: Account) extends OutputData
+case class GetAccountInputData(principal: String, id: String) extends InputData
+case class GetAccountOutputData(payload: Account)             extends OutputData

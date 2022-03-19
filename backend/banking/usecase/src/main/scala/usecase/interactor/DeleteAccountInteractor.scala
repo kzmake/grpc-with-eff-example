@@ -20,5 +20,5 @@ class DeleteAccountInteractor(
   } yield DeleteAccountOutputData()
 }
 
-case class DeleteAccountInputData(id: String) extends InputData
-case class DeleteAccountOutputData()          extends OutputData
+case class DeleteAccountInputData(principal: String, id: String) extends InputData
+case class DeleteAccountOutputData()                             extends OutputData

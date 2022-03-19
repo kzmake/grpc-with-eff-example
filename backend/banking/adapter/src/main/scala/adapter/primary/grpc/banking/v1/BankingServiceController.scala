@@ -9,7 +9,7 @@ import akka.grpc.scaladsl.Metadata
 import org.atnos.eff.syntax.all._
 import usecase.interactor._
 import usecase.port.Port
-import domain.error.MyError
+import domain.error._
 import io.grpc.Status
 import scalapb.validate._
 
@@ -32,7 +32,7 @@ class BankingServiceController(
     }
 
     val principal = metadata.getText("principal").getOrElse("none")
-    val in        = CreateAccountInputData()
+    val in        = CreateAccountInputData(principal = principal)
 
     val out = createAccountPort
       .execute[AStack](in)
@@ -53,7 +53,8 @@ class BankingServiceController(
             )
           )
         )
-      case Left(e) => Future.failed(e)
+      case Left(e) =>
+        Future.failed(new GrpcServiceException(Status.UNKNOWN.withDescription(e.getMessage)))
     }
   }
 
@@ -67,7 +68,7 @@ class BankingServiceController(
     }
 
     val principal = metadata.getText("principal").getOrElse("none")
-    val in        = GetAccountInputData(id = req.id)
+    val in        = GetAccountInputData(principal = principal, id = req.id)
     val out = getAccountPort
       .execute[AStack](in)
       .runAuthz(principal)
@@ -87,7 +88,12 @@ class BankingServiceController(
             )
           )
         )
-      case Left(e) => Future.failed(e)
+      case Left(e: NotFoundError) =>
+        Future.failed(new GrpcServiceException(Status.NOT_FOUND.withDescription(e.getMessage)))
+      case Left(e: UnauthorizedError) =>
+        Future.failed(new GrpcServiceException(Status.UNAUTHENTICATED.withDescription(e.getMessage)))
+      case Left(e) =>
+        Future.failed(new GrpcServiceException(Status.UNKNOWN.withDescription(e.getMessage)))
     }
   }
 
@@ -101,7 +107,7 @@ class BankingServiceController(
     }
 
     val principal = metadata.getText("principal").getOrElse("none")
-    val in        = DepositMoneyInputData(id = req.id, money = req.money)
+    val in        = DepositMoneyInputData(principal = principal, id = req.id, money = req.money)
     val out = depositMoneyPort
       .execute[AStack](in)
       .runAuthz(principal)
@@ -121,7 +127,12 @@ class BankingServiceController(
             )
           )
         )
-      case Left(e) => Future.failed(e)
+      case Left(e: NotFoundError) =>
+        Future.failed(new GrpcServiceException(Status.NOT_FOUND.withDescription(e.getMessage)))
+      case Left(e: UnauthorizedError) =>
+        Future.failed(new GrpcServiceException(Status.UNAUTHENTICATED.withDescription(e.getMessage)))
+      case Left(e) =>
+        Future.failed(new GrpcServiceException(Status.UNKNOWN.withDescription(e.getMessage)))
     }
   }
 
@@ -135,7 +146,7 @@ class BankingServiceController(
     }
 
     val principal = metadata.getText("principal").getOrElse("none")
-    val in        = WithdrawMoneyInputData(id = req.id, money = req.money)
+    val in        = WithdrawMoneyInputData(principal = principal, id = req.id, money = req.money)
     val out = withdrawMoneyPort
       .execute[AStack](in)
       .runAuthz(principal)
@@ -155,7 +166,12 @@ class BankingServiceController(
             )
           )
         )
-      case Left(e) => Future.failed(e)
+      case Left(e: NotFoundError) =>
+        Future.failed(new GrpcServiceException(Status.NOT_FOUND.withDescription(e.getMessage)))
+      case Left(e: UnauthorizedError) =>
+        Future.failed(new GrpcServiceException(Status.UNAUTHENTICATED.withDescription(e.getMessage)))
+      case Left(e) =>
+        Future.failed(new GrpcServiceException(Status.UNKNOWN.withDescription(e.getMessage)))
     }
   }
 
@@ -169,7 +185,7 @@ class BankingServiceController(
     }
 
     val principal = metadata.getText("principal").getOrElse("none")
-    val in        = DeleteAccountInputData(id = req.id)
+    val in        = DeleteAccountInputData(principal = principal, id = req.id)
     val out = deleteAccountPort
       .execute[AStack](in)
       .runAuthz(principal)
@@ -178,8 +194,14 @@ class BankingServiceController(
       .run
 
     out match {
-      case Right(v) => Future.successful(v1.DeleteAccountResponse())
-      case Left(e)  => Future.failed(e)
+      case Right(v) =>
+        Future.successful(v1.DeleteAccountResponse())
+      case Left(e: NotFoundError) =>
+        Future.failed(new GrpcServiceException(Status.NOT_FOUND.withDescription(e.getMessage)))
+      case Left(e: UnauthorizedError) =>
+        Future.failed(new GrpcServiceException(Status.UNAUTHENTICATED.withDescription(e.getMessage)))
+      case Left(e) =>
+        Future.failed(new GrpcServiceException(Status.UNKNOWN.withDescription(e.getMessage)))
     }
   }
 }

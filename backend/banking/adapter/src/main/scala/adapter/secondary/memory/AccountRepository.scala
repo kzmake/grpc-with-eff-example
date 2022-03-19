@@ -14,28 +14,26 @@ import scala.collection.concurrent.TrieMap
 class AccountRepository(
     val datastore: TrieMap[Id[Account], Account]
 ) extends Repository[Account] {
-  override def add[R: _authz: _myErrorEither](aggregateRoot: Account): Eff[R, Account] = {
-    for {
-      _ <- datastore.addOne(aggregateRoot.id, aggregateRoot).pureEff[R]
-      a <- resolve[R](aggregateRoot.id)
-    } yield a
-  }
+  override def add[R: _authz: _myErrorEither](aggregateRoot: Account): Eff[R, Account] = for {
+    _ <- datastore.addOne(aggregateRoot.id, aggregateRoot).pureEff[R]
+    a <- resolve[R](aggregateRoot.id)
+  } yield a
 
   override def update[R: _authz: _myErrorEither](aggregateRoot: Account): Eff[R, Account] = for {
-    _ <- Authz.require(aggregateRoot.id.resourceScope)
+    _ <- Authz.require[R](aggregateRoot.id.scope)
 
     _ <- datastore.update(aggregateRoot.id, aggregateRoot).pureEff[R]
     a <- resolve[R](aggregateRoot.id)
   } yield a
 
   override def get[R: _authz](id: Id[Account]): Eff[R, Option[Account]] = for {
-    _ <- Authz.require(id.resourceScope)
+    _ <- Authz.require[R](id.scope)
 
     a <- datastore.get(id).pureEff[R]
   } yield a
 
   override def remove[R: _authz: _myErrorEither](aggregateRoot: Account): Eff[R, Unit] = for {
-    _ <- Authz.require(aggregateRoot.id.resourceScope)
+    _ <- Authz.require[R](aggregateRoot.id.scope)
 
     _ <- datastore.remove(aggregateRoot.id, aggregateRoot).pureEff[R]
   } yield ()

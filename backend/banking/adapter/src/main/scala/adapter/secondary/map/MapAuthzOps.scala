@@ -2,7 +2,7 @@ package adapter.secondary.map
 
 import domain.eff.MyErrorEither._myErrorEither
 import domain.eff._
-import domain.error.{MyError, UnauthorizedError}
+import domain.error._
 import org.atnos.eff.Interpret.translate
 import org.atnos.eff._
 import org.atnos.eff.either._
@@ -37,14 +37,14 @@ object MapAuthzOps extends AuthzInterpreter {
     translate(effects)(new Translate[Authz, U] {
       def apply[X](a: Authz[X]): Eff[U, X] =
         a match {
-          case Allocate(principal, scopes) =>
-            val p = policiesStore.getOrElse(principal, Set.empty)
-            policiesStore += (principal -> (p ++ scopes))
+          case Allocate(principal, s) =>
+            val policies = policiesStore.getOrElse(principal, Set.empty)
+            policiesStore += (principal -> (policies + s))
             ().asInstanceOf[X].pureEff[U]
 
-          case Require(scopes) =>
-            val s = scopesStore.getOrElse("required", Set.empty)
-            scopesStore += ("required" -> (s ++ scopes))
+          case Require(s) =>
+            val scopes = scopesStore.getOrElse("required", Set.empty)
+            scopesStore += ("required" -> (scopes + s))
             ().asInstanceOf[X].pureEff[U]
 
           case Authorize(principal) =>

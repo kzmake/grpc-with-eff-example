@@ -1,11 +1,12 @@
 package adapter.primary.grpc.banking.v1
 
 import adapter.secondary.memory.AccountRepository
+import akka.grpc.GrpcServiceException
 import api.banking._
 import akka.grpc.scaladsl.MetadataBuilder
 import domain.account._
-import domain.error.UnauthorizedError
 import domain.shared.Id
+import io.grpc.Status
 import org.scalatest.concurrent.ScalaFutures.convertScalaFuture
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers._
@@ -181,12 +182,14 @@ class BankingServiceControllerSpec extends AnyFreeSpec {
         deleteAccount
       )
 
-      val md       = new MetadataBuilder().addText("principal", "bob").build()
-      val req      = v1.GetAccountRequest(id = "1")
-      val expected = UnauthorizedError("認可に失敗しました: bob の Set(2) に Set(1) が含まれていない")
+      val md  = new MetadataBuilder().addText("principal", "bob").build()
+      val req = v1.GetAccountRequest(id = "1")
+      val expected = new GrpcServiceException(
+        Status.UNAUTHENTICATED.withDescription("認可に失敗しました: bob の Set(2) に Set(1) が含まれていない")
+      )
 
       val e = service.getAccount(req, md).failed.futureValue
-      e mustBe expected
+      e.getMessage mustBe expected.getMessage
     }
 
     "KO: bobがaliceの作成した口座を取得できない" in {
@@ -215,11 +218,13 @@ class BankingServiceControllerSpec extends AnyFreeSpec {
         .createAccount(v1.CreateAccountRequest(), new MetadataBuilder().addText("principal", "alice").build())
         .futureValue
 
-      val req      = v1.GetAccountRequest(id = createRes.getAccount.id)
-      val expected = UnauthorizedError(s"認可に失敗しました: bob の Set(2) に Set(${createRes.getAccount.id}) が含まれていない")
+      val req = v1.GetAccountRequest(id = createRes.getAccount.id)
+      val expected = new GrpcServiceException(
+        Status.UNAUTHENTICATED.withDescription(s"認可に失敗しました: bob の Set(2) に Set(${createRes.getAccount.id}) が含まれていない")
+      )
 
       val e = service.getAccount(req, md).failed.futureValue
-      e mustBe expected
+      e.getMessage mustBe expected.getMessage
     }
 
   }
@@ -353,12 +358,14 @@ class BankingServiceControllerSpec extends AnyFreeSpec {
         deleteAccount
       )
 
-      val md       = new MetadataBuilder().addText("principal", "bob").build()
-      val req      = v1.DepositMoneyRequest(id = "1", money = 10000)
-      val expected = UnauthorizedError("認可に失敗しました: bob の Set(2) に Set(1) が含まれていない")
+      val md  = new MetadataBuilder().addText("principal", "bob").build()
+      val req = v1.DepositMoneyRequest(id = "1", money = 10000)
+      val expected = new GrpcServiceException(
+        Status.UNAUTHENTICATED.withDescription("認可に失敗しました: bob の Set(2) に Set(1) が含まれていない")
+      )
 
       val e = service.depositMoney(req, md).failed.futureValue
-      e mustBe expected
+      e.getMessage mustBe expected.getMessage
     }
 
     "KO: bobがaliceの作成した口座に預け入れできない" in {
@@ -387,11 +394,13 @@ class BankingServiceControllerSpec extends AnyFreeSpec {
         .createAccount(v1.CreateAccountRequest(), new MetadataBuilder().addText("principal", "alice").build())
         .futureValue
 
-      val req      = v1.DepositMoneyRequest(id = createRes.getAccount.id, money = 10000)
-      val expected = UnauthorizedError(s"認可に失敗しました: bob の Set(2) に Set(${createRes.getAccount.id}) が含まれていない")
+      val req = v1.DepositMoneyRequest(id = createRes.getAccount.id, money = 10000)
+      val expected = new GrpcServiceException(
+        Status.UNAUTHENTICATED.withDescription(s"認可に失敗しました: bob の Set(2) に Set(${createRes.getAccount.id}) が含まれていない")
+      )
 
       val e = service.depositMoney(req, md).failed.futureValue
-      e mustBe expected
+      e.getMessage mustBe expected.getMessage
     }
 
   }
@@ -504,12 +513,14 @@ class BankingServiceControllerSpec extends AnyFreeSpec {
         deleteAccount
       )
 
-      val md       = new MetadataBuilder().addText("principal", "bob").build()
-      val req      = v1.DeleteAccountRequest(id = "1")
-      val expected = UnauthorizedError("認可に失敗しました: bob の Set(2) に Set(1) が含まれていない")
+      val md  = new MetadataBuilder().addText("principal", "bob").build()
+      val req = v1.DeleteAccountRequest(id = "1")
+      val expected = new GrpcServiceException(
+        Status.UNAUTHENTICATED.withDescription("認可に失敗しました: bob の Set(2) に Set(1) が含まれていない")
+      )
 
       val e = service.deleteAccount(req, md).failed.futureValue
-      e mustBe expected
+      e.getMessage mustBe expected.getMessage
     }
 
     "KO: bobがaliceの作成した口座を削除できない" in {
@@ -538,11 +549,13 @@ class BankingServiceControllerSpec extends AnyFreeSpec {
         .createAccount(v1.CreateAccountRequest(), new MetadataBuilder().addText("principal", "alice").build())
         .futureValue
 
-      val req      = v1.DeleteAccountRequest(id = createRes.getAccount.id)
-      val expected = UnauthorizedError(s"認可に失敗しました: bob の Set(2) に Set(${createRes.getAccount.id}) が含まれていない")
+      val req = v1.DeleteAccountRequest(id = createRes.getAccount.id)
+      val expected = new GrpcServiceException(
+        Status.UNAUTHENTICATED.withDescription(s"認可に失敗しました: bob の Set(2) に Set(${createRes.getAccount.id}) が含まれていない")
+      )
 
       val e = service.deleteAccount(req, md).failed.futureValue
-      e mustBe expected
+      e.getMessage mustBe expected.getMessage
     }
 
   }

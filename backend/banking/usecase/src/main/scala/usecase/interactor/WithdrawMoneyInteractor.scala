@@ -21,5 +21,5 @@ class WithdrawMoneyInteractor(
   } yield WithdrawMoneyOutputData(payload = updated)
 }
 
-case class WithdrawMoneyInputData(id: String, money: Long) extends InputData
-case class WithdrawMoneyOutputData(payload: Account)       extends OutputData
+case class WithdrawMoneyInputData(principal: String, id: String, money: Long) extends InputData
+case class WithdrawMoneyOutputData(payload: Account)                          extends OutputData

@@ -21,5 +21,5 @@ class DepositMoneyInteractor(
   } yield DepositMoneyOutputData(payload = updated)
 }
 
-case class DepositMoneyInputData(id: String, money: Long) extends InputData
-case class DepositMoneyOutputData(payload: Account)       extends OutputData
+case class DepositMoneyInputData(principal: String, id: String, money: Long) extends InputData
+case class DepositMoneyOutputData(payload: Account)                          extends OutputData
