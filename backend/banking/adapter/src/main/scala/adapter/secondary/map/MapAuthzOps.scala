@@ -11,6 +11,7 @@ import org.atnos.eff.syntax.all._
 import scala.collection.concurrent.TrieMap
 
 object MapAuthzOps extends AuthzInterpreter {
+  // 今回は作り込まないでインメモリで認可するよ
   private val scopesStore = TrieMap.empty[String, Set[String]]
   private val policiesStore = TrieMap(
     "none"  -> Set.empty[String],
@@ -19,11 +20,13 @@ object MapAuthzOps extends AuthzInterpreter {
   )
 
   implicit class AuthzOps[R, A](effects: Eff[R, A]) {
+    // 最後にauthorizeを積んで実施: 認可したいAPIなどのコントローラーで利用
     def runAuthz[U](principal: String)(implicit
         m: Member.Aux[Authz, R, U],
         m1: _myErrorEither[U]
     ): Eff[U, A] = run(effects << Authz.authorize(principal))
 
+    // authorizeなしで実施: バッチなどのコントローラーで利用
     def runAuthzWithoutAuthorize[U](implicit
         m: Member.Aux[Authz, R, U],
         m1: _myErrorEither[U]

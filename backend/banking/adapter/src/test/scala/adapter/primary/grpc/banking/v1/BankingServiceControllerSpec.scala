@@ -16,7 +16,7 @@ import scala.collection.concurrent.TrieMap
 
 class BankingServiceControllerSpec extends AnyFreeSpec {
   "#createAccount" - {
-    "OK: aliceが口座を作成できる" in {
+    "OK: aliceが口座を作成できる (課題2: お金の引き出し(WithdrawMoney)のAPIを実装)" in {
       val datastore = TrieMap(
         Id[Account]("1") -> Account(id = Id[Account]("1"), balance = Money(1000)),
         Id[Account]("2") -> Account(id = Id[Account]("2"), balance = Money(999))

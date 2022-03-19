@@ -8,7 +8,7 @@
 
 - [Scalaで始める表明プログラミング](https://speakerdeck.com/dnskimo/scaladeshi-merubiao-ming-puroguramingu) by @dnskimo
 - [Eff（atnos-eff）による実践的なコーディング集](https://speakerdeck.com/shiroichi315/eff-atnos-eff-niyorushi-jian-de-nakodeinguji) by @shiroichi315
-- [AlpのEff独自Effect集](https://scalamatsuri.org/ja/proposals/J1647668100) by @ma2k8
+- [アルプのEff独自エフェクト集 / Alp-original ’Eff’ pearls](https://speakerdeck.com/ma2k8/alp-original-eff-pearls) by @ma2k8
 
 > ⚠ 当コードは架空のサービスを想定したものであり、所属先とは全く関係がありません。
 
@@ -17,21 +17,28 @@
 ```bash
 git clone -b exercise https://github.com/kzmake/grpc-with-eff-example
 ```
+
 よりお試しいただけます！
 
-1. お金の引き出し(WithdrawMoney)のAPIを実装 
-   - WithdrawMoneyの実装
-     - ユースケース層: WithdrawMoneyInteractorの実装
-     - ドメイン層: Accountの実装
-       - 表明プログラミング
+1. お金の引き出し(WithdrawMoney)のAPIを実装
+    - WithdrawMoneyの実装
+        - ドメイン層: Accountの実装
+            - 表明プログラミング(assert / required)
+        - ユースケース層: WithdrawMoneyInteractorの実装
+        - アダプター層: BankingController#withdrawの実装
+
 2. IdGen(Id生成)エフェクトのインタープリター修正
-   - インタープリターの修正
-     - アダプター層: timestampなID採番 -> uuidなID採番
+    - インタープリターの修正
+        - アダプター層: uuidなID採番インタープリターの実装
+        - アダプター層: timestampなID採番 -> uuidなID採番切り替え
+
 3. AuthZ(認可)エフェクトの実装
-   - 独自のAuthZ(認可)エフェクト追加
-     - ドメイン層: エフェクトの定義
-     - アダプター層: インタープリターの実装
-     - アダプター層: リポジトリの実装修正
+    - 独自のAuthZ(認可)エフェクト追加
+        - ドメイン層: 独自エフェクトの定義
+        - アダプター層: インタープリターの実装
+        - アダプター層: リポジトリの実装修正
+        - ユースケース層: 認可スコープの割り当て
+        - 各層: _authz 追加
 
 > 🔔 3 の認可は簡易化のため `-H "principal: alice"` として認可対象を指定できるものとします。
 
@@ -88,8 +95,10 @@ $ tree
 
 buf.build / akka-grpc(scalapb) を用いて、
 
-- [API仕様(openapiv2)](https://github.com/kzmake/grpc-with-eff-example/blob/main/api/gen/openapiv2/banking/v1/banking.swagger.json): buf generate実行時
-- [gatewayのためのコード(golang + grpc-gateway)](https://github.com/kzmake/grpc-with-eff-example/tree/main/api/gen/go/banking/v1): buf generate実行時
+- [API仕様(openapiv2)](https://github.com/kzmake/grpc-with-eff-example/blob/main/api/gen/openapiv2/banking/v1/banking.swagger.json):
+  buf generate実行時
+- [gatewayのためのコード(golang + grpc-gateway)](https://github.com/kzmake/grpc-with-eff-example/tree/main/api/gen/go/banking/v1):
+  buf generate実行時
 - [bankingのためのコード(scala)](https://doc.akka.io/docs/akka-grpc/current/overview.html): sbt compile実行時
 - [バリデーションコード(protoc-gen-validate with scalapb)](https://scalapb.github.io/docs/validation/): sbt compile実行時
 
@@ -140,5 +149,8 @@ Content-Length: 74
 - https://docs.buf.build/introduction
 - https://scalapb.github.io/docs/validation/
 - [Scalaで始める表明プログラミング](https://speakerdeck.com/dnskimo/scaladeshi-merubiao-ming-puroguramingu) by @dnskimo
-- [Eff（atnos-eff）による実践的なコーディング集](https://speakerdeck.com/shiroichi315/eff-atnos-eff-niyorushi-jian-de-nakodeinguji) by @shiroichi315
-- [AlpのEff独自Effect集](https://scalamatsuri.org/ja/proposals/J1647668100) by @ma2k8
+- [Eff（atnos-eff）による実践的なコーディング集](https://speakerdeck.com/shiroichi315/eff-atnos-eff-niyorushi-jian-de-nakodeinguji) by
+  @shiroichi315
+- [アルプのEff独自エフェクト集 / Alp-original ’Eff’ pearls](https://speakerdeck.com/ma2k8/alp-original-eff-pearls) by @ma2k8
+- [Clean ArchitectureとEffで変更に強いAPIを設計する / API design by Clean Architecture ...](https://speakerdeck.com/kaelaela/api-design-by-clean-architecture-and-eff)
+  by @kaelaela
