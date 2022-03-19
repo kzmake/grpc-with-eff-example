@@ -115,6 +115,7 @@ class BankingServiceController(
       .runEither[MyError]
       .run
 
+    // Presenterとして切り出すのがいいんだけど…そのまま置いときます
     out match {
       case Right(v) =>
         Future.successful(
