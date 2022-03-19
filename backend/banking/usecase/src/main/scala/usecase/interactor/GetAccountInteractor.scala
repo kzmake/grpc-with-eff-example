@@ -14,7 +14,8 @@ import usecase.port.OutputData
 class GetAccountInteractor(
     val accountRepository: Repository[Account]
 ) extends Port[GetAccountInputData, GetAccountOutputData] {
-  def execute[R: _authz: _idgen: _myErrorEither](in: GetAccountInputData): Eff[R, GetAccountOutputData] = for {
+  // TODO: 課題3: AuthZ(認可)エフェクトの実装 / _authz 追加
+  def execute[R: _idgen: _myErrorEither](in: GetAccountInputData): Eff[R, GetAccountOutputData] = for {
     got <- accountRepository.resolve[R](Id[Account](in.id))
   } yield GetAccountOutputData(payload = got)
 }

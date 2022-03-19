@@ -3,7 +3,8 @@ package adapter.primary.grpc.banking.v1
 import api.banking._
 import adapter.eff.Stack._
 import adapter.secondary.map.MapAuthzOps.AuthzOps
-import adapter.secondary.uuid.UUIDIdGenOps.IdGenOps
+// TODO: 課題2: IdGen(Id生成)エフェクトのインタープリター実装 / アダプター層: timestampなID採番 -> uuidなID採番切り替え
+import adapter.secondary.timestamp.TimestampIdGenOps.IdGenOps
 import akka.grpc.GrpcServiceException
 import akka.grpc.scaladsl.Metadata
 import org.atnos.eff.syntax.all._
@@ -36,7 +37,7 @@ class BankingServiceController(
 
     val out = createAccountPort
       .execute[AStack](in)
-      .runAuthz(principal)
+      // TODO: 課題3: AuthZ(認可)エフェクトの実装 / アダプター層: インタープリター実行
       .runIdGen
       .runEither[MyError]
       .run
@@ -71,7 +72,7 @@ class BankingServiceController(
     val in        = GetAccountInputData(principal = principal, id = req.id)
     val out = getAccountPort
       .execute[AStack](in)
-      .runAuthz(principal)
+      // TODO: 課題3: AuthZ(認可)エフェクトの実装 / アダプター層: インタープリター実行
       .runIdGen
       .runEither[MyError]
       .run
@@ -110,7 +111,7 @@ class BankingServiceController(
     val in        = DepositMoneyInputData(principal = principal, id = req.id, money = req.money)
     val out = depositMoneyPort
       .execute[AStack](in)
-      .runAuthz(principal)
+      // TODO: 課題3: AuthZ(認可)エフェクトの実装 / アダプター層: インタープリター実行
       .runIdGen
       .runEither[MyError]
       .run
@@ -137,44 +138,8 @@ class BankingServiceController(
     }
   }
 
-  override def withdrawMoney(req: v1.WithdrawMoneyRequest, metadata: Metadata): Future[v1.WithdrawMoneyResponse] = {
-    Validator[v1.WithdrawMoneyRequest].validate(req) match {
-      case Success =>
-      case Failure(violations) =>
-        throw new GrpcServiceException(
-          Status.INVALID_ARGUMENT.withDescription(violations.mkString(": "))
-        )
-    }
-
-    val principal = metadata.getText("principal").getOrElse("none")
-    val in        = WithdrawMoneyInputData(principal = principal, id = req.id, money = req.money)
-    val out = withdrawMoneyPort
-      .execute[AStack](in)
-      .runAuthz(principal)
-      .runIdGen
-      .runEither[MyError]
-      .run
-
-    out match {
-      case Right(v) =>
-        Future.successful(
-          v1.WithdrawMoneyResponse(
-            Some(
-              v1.Account(
-                id = v.payload.id.value,
-                balance = v.payload.balance.value
-              )
-            )
-          )
-        )
-      case Left(e: NotFoundError) =>
-        Future.failed(new GrpcServiceException(Status.NOT_FOUND.withDescription(e.getMessage)))
-      case Left(e: UnauthorizedError) =>
-        Future.failed(new GrpcServiceException(Status.UNAUTHENTICATED.withDescription(e.getMessage)))
-      case Left(e) =>
-        Future.failed(new GrpcServiceException(Status.UNKNOWN.withDescription(e.getMessage)))
-    }
-  }
+  // TODO: 課題2: お金の引き出し(WithdrawMoney)のAPIを実装 / アダプター層: Accountの実装
+  override def withdrawMoney(req: v1.WithdrawMoneyRequest, metadata: Metadata): Future[v1.WithdrawMoneyResponse] = ???
 
   override def deleteAccount(req: v1.DeleteAccountRequest, metadata: Metadata): Future[v1.DeleteAccountResponse] = {
     Validator[v1.DeleteAccountRequest].validate(req) match {
@@ -189,7 +154,7 @@ class BankingServiceController(
     val in        = DeleteAccountInputData(principal = principal, id = req.id)
     val out = deleteAccountPort
       .execute[AStack](in)
-      .runAuthz(principal)
+      // TODO: 課題3: AuthZ(認可)エフェクトの実装 / アダプター層: インタープリター実行
       .runIdGen
       .runEither[MyError]
       .run

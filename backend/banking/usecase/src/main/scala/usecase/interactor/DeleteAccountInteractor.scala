@@ -14,7 +14,8 @@ import usecase.port.OutputData
 class DeleteAccountInteractor(
     val accountRepository: Repository[Account]
 ) extends Port[DeleteAccountInputData, DeleteAccountOutputData] {
-  def execute[R: _authz: _idgen: _myErrorEither](in: DeleteAccountInputData): Eff[R, DeleteAccountOutputData] = for {
+  // TODO: 課題3: AuthZ(認可)エフェクトの実装 / _authz 追加
+  def execute[R: _idgen: _myErrorEither](in: DeleteAccountInputData): Eff[R, DeleteAccountOutputData] = for {
     account <- accountRepository.resolve[R](Id[Account](in.id))
     _       <- accountRepository.remove[R](account)
   } yield DeleteAccountOutputData()

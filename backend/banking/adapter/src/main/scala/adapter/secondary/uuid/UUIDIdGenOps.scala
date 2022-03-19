@@ -8,20 +8,14 @@ import org.atnos.eff._
 import org.atnos.eff.syntax.all._
 
 object UUIDIdGenOps extends IdGenInterpreter {
+  // TODO: 課題2: IdGen(Id生成)エフェクトのインタープリター実装 / アダプター層: uuidなID採番インタープリターの実装
   implicit class IdGenOps[R, A](effects: Eff[R, A]) {
     def runIdGen[U](implicit
         m: Member.Aux[IdGen, R, U]
-    ): Eff[U, A] = run(() => UUID.randomUUID().toString, effects)
+    ): Eff[U, A] = ???
   }
 
   def run[R, U, A](generator: () => String, effects: Eff[R, A])(implicit
       m: Member.Aux[IdGen, R, U]
-  ): Eff[U, A] = {
-    translate(effects)(new Translate[IdGen, U] {
-      def apply[X](a: IdGen[X]): Eff[U, X] =
-        a match {
-          case v: Generate[_] => Id[X](generator()).asInstanceOf[X].pureEff[U]
-        }
-    })
-  }
+  ): Eff[U, A] = ???
 }

@@ -10,8 +10,9 @@ import org.atnos.eff.Eff
 import org.atnos.eff.all.fromEither
 
 final case class Account(id: Id[Account], balance: Money) extends AggregateRoot[Account] {
-  assert(id.value.nonEmpty, "口座番号は空にならない")
-  assert(balance >= Money.zero, "残高が0未満になることはない")
+  // TODO: 課題1: お金の引き出し(WithdrawMoney)のAPIを実装 / ドメイン層: Accountの実装
+  // 口座番号は空にならない
+  // 残高が0未満になることはない
 
   def deposit[R: _myErrorEither](money: Money): Eff[R, Account] = {
     require(Money.zero < money, "預け入れ額は1以上")
@@ -22,16 +23,8 @@ final case class Account(id: Id[Account], balance: Money) extends AggregateRoot[
     } yield account
   }
 
-  def withdraw[R: _myErrorEither](money: Money): Eff[R, Account] = {
-    require(Money.zero < money, "引き出し額は1以上")
-
-    for {
-      account <- fromEither[R, MyError, Account](
-        if (money <= this.balance) Right(copy(balance = balance - money))
-        else Left(StateError("残高が不足しています"))
-      )
-    } yield account
-  }
+  // TODO: 課題1: お金の引き出し(WithdrawMoney)のAPIを実装 / ドメイン層: Accountの実装
+  def withdraw[R: _myErrorEither](money: Money): Eff[R, Account] = ???
 }
 
 object Account {

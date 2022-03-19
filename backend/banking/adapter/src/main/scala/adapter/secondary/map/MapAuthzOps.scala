@@ -10,6 +10,7 @@ import org.atnos.eff.syntax.all._
 
 import scala.collection.concurrent.TrieMap
 
+// TODO: 課題3: AuthZ(認可)エフェクトの実装 / アダプター層: インタープリターの実装
 object MapAuthzOps extends AuthzInterpreter {
   // 今回は作り込まないでインメモリで認可するよ
   private val scopesStore = TrieMap.empty[String, Set[String]]
@@ -36,35 +37,5 @@ object MapAuthzOps extends AuthzInterpreter {
   def run[R, U, A](principal: String, effects: Eff[R, A])(implicit
       m: Member.Aux[Authz, R, U],
       m1: _myErrorEither[U]
-  ): Eff[U, A] = {
-    translate(effects)(new Translate[Authz, U] {
-      def apply[X](a: Authz[X]): Eff[U, X] =
-        a match {
-          case Allocate(s) =>
-            val policies = policiesStore.getOrElse(principal, Set.empty)
-            policiesStore += (principal -> (policies + s))
-            ().asInstanceOf[X].pureEff[U]
-
-          case Require(s) =>
-            val scopes = scopesStore.getOrElse("required", Set.empty)
-            scopesStore += ("required" -> (scopes + s))
-            ().asInstanceOf[X].pureEff[U]
-
-          case Authorize() =>
-            for {
-              _ <- {
-                val scopes   = scopesStore.getOrElse("required", Set.empty[String])
-                val policies = policiesStore.getOrElse(principal, Set.empty[String])
-                if (scopes.forall(s => policies.contains(s)))
-                  fromEither[U, MyError, Unit](Right(()))
-                else
-                  fromEither[U, MyError, X](
-                    Left(UnauthorizedError(s"認可に失敗しました: $principal の $policies に $scopes が含まれていない"))
-                  )
-              }
-              _ = scopesStore += ("required" -> Set.empty)
-            } yield ().asInstanceOf[X]
-        }
-    })
-  }
+  ): Eff[U, A] = ???
 }

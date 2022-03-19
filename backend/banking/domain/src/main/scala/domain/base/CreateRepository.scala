@@ -5,5 +5,6 @@ import domain.eff.MyErrorEither._myErrorEither
 import org.atnos.eff.Eff
 
 trait CreateRepository[T <: AggregateRoot[T]] {
-  def add[R: _authz: _myErrorEither](aggregateRoot: T): Eff[R, T]
+  // TODO: 課題3: AuthZ(認可)エフェクトの実装 / _authz 追加
+  def add[R: _myErrorEither](aggregateRoot: T): Eff[R, T]
 }

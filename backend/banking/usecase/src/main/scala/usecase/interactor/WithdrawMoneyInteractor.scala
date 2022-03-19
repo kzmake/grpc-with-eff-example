@@ -14,11 +14,9 @@ import usecase.port.OutputData
 class WithdrawMoneyInteractor(
     val accountRepository: Repository[Account]
 ) extends Port[WithdrawMoneyInputData, WithdrawMoneyOutputData] {
-  def execute[R: _authz: _idgen: _myErrorEither](in: WithdrawMoneyInputData): Eff[R, WithdrawMoneyOutputData] = for {
-    before  <- accountRepository.resolve[R](Id[Account](in.id))
-    after   <- before.withdraw[R](Money(in.money))
-    updated <- accountRepository.update[R](after)
-  } yield WithdrawMoneyOutputData(payload = updated)
+  // TODO: 課題1: お金の引き出し(WithdrawMoney)のAPIを実装 / ユースケース層: WithdrawMoneyInteractorの実装
+  // TODO: 課題3: AuthZ(認可)エフェクトの実装 / _authz 追加
+  def execute[R: _idgen: _myErrorEither](in: WithdrawMoneyInputData): Eff[R, WithdrawMoneyOutputData] = ???
 }
 
 case class WithdrawMoneyInputData(principal: String, id: String, money: Long) extends InputData

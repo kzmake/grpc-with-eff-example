@@ -14,7 +14,8 @@ import usecase.port.OutputData
 class CreateAccountInteractor(
     val accountRepository: Repository[Account]
 ) extends Port[CreateAccountInputData, CreateAccountOutputData] {
-  def execute[R: _authz: _idgen: _myErrorEither](in: CreateAccountInputData): Eff[R, CreateAccountOutputData] = for {
+  // TODO: 課題3: AuthZ(認可)エフェクトの実装 / _authz 追加
+  def execute[R: _idgen: _myErrorEither](in: CreateAccountInputData): Eff[R, CreateAccountOutputData] = for {
     account <- Account.applyEff[R]
     created <- accountRepository.add[R](account)
   } yield CreateAccountOutputData(payload = created)

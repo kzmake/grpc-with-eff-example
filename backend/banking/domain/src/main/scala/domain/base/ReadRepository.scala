@@ -8,7 +8,8 @@ import org.atnos.eff.Eff
 import org.atnos.eff.either._
 
 trait ReadRepository[T <: AggregateRoot[T]] {
-  def resolve[R: _authz: _myErrorEither](id: Id[T]): Eff[R, T] = for {
+  // TODO: 課題3: AuthZ(認可)エフェクトの実装 / _authz 追加
+  def resolve[R: _myErrorEither](id: Id[T]): Eff[R, T] = for {
     maybe <- get[R](id)
     aggregateRoot <- fromEither[R, MyError, T](maybe match {
       case Some(v) => Right(v)
@@ -16,5 +17,6 @@ trait ReadRepository[T <: AggregateRoot[T]] {
     })
   } yield aggregateRoot
 
-  def get[R: _authz](id: Id[T]): Eff[R, Option[T]]
+  // TODO: 課題3: AuthZ(認可)エフェクトの実装 / _authz 追加
+  def get[R](id: Id[T]): Eff[R, Option[T]]
 }
