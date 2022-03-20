@@ -16,7 +16,7 @@ import scala.collection.concurrent.TrieMap
 
 class BankingServiceControllerSpec extends AnyFreeSpec {
   "#createAccount" - {
-    "OK: aliceが口座を作成できる (課題2: お金の引き出し(WithdrawMoney)のAPIを実装)" in {
+    "OK: aliceが口座を作成できる (課題2: IdGen(Id生成)エフェクトのインタープリター実装)" in {
       val datastore = TrieMap(
         Id[Account]("1") -> Account(id = Id[Account]("1"), balance = Money(1000)),
         Id[Account]("2") -> Account(id = Id[Account]("2"), balance = Money(999))
@@ -401,6 +401,79 @@ class BankingServiceControllerSpec extends AnyFreeSpec {
 
       val e = service.depositMoney(req, md).failed.futureValue
       e.getMessage mustBe expected.getMessage
+    }
+
+  }
+
+  "#withdrawMoney (課題1: お金の引き出し(WithdrawMoney)のAPIを実装)" - {
+    "OK: aliceが口座から引き出しできる" in {
+      val datastore = TrieMap(
+        Id[Account]("1") -> Account(id = Id[Account]("1"), balance = Money(1000)),
+        Id[Account]("2") -> Account(id = Id[Account]("2"), balance = Money(999))
+      )
+      val accountRepository = new AccountRepository(datastore)
+      val createAccount     = new CreateAccountInteractor(accountRepository)
+      val getAccount        = new GetAccountInteractor(accountRepository)
+      val depositMoney      = new DepositMoneyInteractor(accountRepository)
+      val withdrawMoney     = new WithdrawMoneyInteractor(accountRepository)
+      val deleteAccount     = new DeleteAccountInteractor(accountRepository)
+      val service = new BankingServiceController(
+        createAccount,
+        getAccount,
+        depositMoney,
+        withdrawMoney,
+        deleteAccount
+      )
+
+      val md  = new MetadataBuilder().addText("principal", "alice").build()
+      val req = v1.WithdrawMoneyRequest(id = "1", money = 999)
+      val expected = v1.WithdrawMoneyResponse(
+        Some(
+          v1.Account(
+            id = "1",
+            balance = 1
+          )
+        )
+      )
+
+      val res = service.withdrawMoney(req, md).futureValue
+
+      res mustBe expected
+    }
+
+    "OK: bobが口座から引き出しできる" in {
+      val datastore = TrieMap(
+        Id[Account]("1") -> Account(id = Id[Account]("1"), balance = Money(1000)),
+        Id[Account]("2") -> Account(id = Id[Account]("2"), balance = Money(999))
+      )
+      val accountRepository = new AccountRepository(datastore)
+      val createAccount     = new CreateAccountInteractor(accountRepository)
+      val getAccount        = new GetAccountInteractor(accountRepository)
+      val depositMoney      = new DepositMoneyInteractor(accountRepository)
+      val withdrawMoney     = new WithdrawMoneyInteractor(accountRepository)
+      val deleteAccount     = new DeleteAccountInteractor(accountRepository)
+      val service = new BankingServiceController(
+        createAccount,
+        getAccount,
+        depositMoney,
+        withdrawMoney,
+        deleteAccount
+      )
+
+      val md  = new MetadataBuilder().addText("principal", "bob").build()
+      val req = v1.WithdrawMoneyRequest(id = "2", money = 999)
+      val expected = v1.WithdrawMoneyResponse(
+        Some(
+          v1.Account(
+            id = "2",
+            balance = 0
+          )
+        )
+      )
+
+      val res = service.withdrawMoney(req, md).futureValue
+
+      res mustBe expected
     }
 
   }
