@@ -15,6 +15,8 @@ class AccountRepository(
     val datastore: TrieMap[Id[Account], Account]
 ) extends Repository[Account] {
   override def add[R: _authz: _myErrorEither](aggregateRoot: Account): Eff[R, Account] = for {
+    _ <- Authz.allocate[R](aggregateRoot.id.scope)
+
     _ <- datastore.addOne(aggregateRoot.id, aggregateRoot).pureEff[R]
     a <- resolve[R](aggregateRoot.id)
   } yield a

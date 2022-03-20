@@ -17,7 +17,6 @@ class CreateAccountInteractor(
   def execute[R: _authz: _idgen: _myErrorEither](in: CreateAccountInputData): Eff[R, CreateAccountOutputData] = for {
     account <- Account.applyEff[R]
     created <- accountRepository.add[R](account)
-    _       <- Authz.allocate[R](in.principal, created.id.scope)
   } yield CreateAccountOutputData(payload = created)
 }
 

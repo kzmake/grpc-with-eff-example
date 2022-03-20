@@ -24,23 +24,23 @@ object MapAuthzOps extends AuthzInterpreter {
     def runAuthz[U](principal: String)(implicit
         m: Member.Aux[Authz, R, U],
         m1: _myErrorEither[U]
-    ): Eff[U, A] = run(effects << Authz.authorize(principal))
+    ): Eff[U, A] = run(principal, effects << Authz.authorize)
 
     // authorizeなしで実施: バッチなどのコントローラーで利用
     def runAuthzWithoutAuthorize[U](implicit
         m: Member.Aux[Authz, R, U],
         m1: _myErrorEither[U]
-    ): Eff[U, A] = run(effects)
+    ): Eff[U, A] = run("system", effects)
   }
 
-  def run[R, U, A](effects: Eff[R, A])(implicit
+  def run[R, U, A](principal: String, effects: Eff[R, A])(implicit
       m: Member.Aux[Authz, R, U],
       m1: _myErrorEither[U]
   ): Eff[U, A] = {
     translate(effects)(new Translate[Authz, U] {
       def apply[X](a: Authz[X]): Eff[U, X] =
         a match {
-          case Allocate(principal, s) =>
+          case Allocate(s) =>
             val policies = policiesStore.getOrElse(principal, Set.empty)
             policiesStore += (principal -> (policies + s))
             ().asInstanceOf[X].pureEff[U]
@@ -50,7 +50,7 @@ object MapAuthzOps extends AuthzInterpreter {
             scopesStore += ("required" -> (scopes + s))
             ().asInstanceOf[X].pureEff[U]
 
-          case Authorize(principal) =>
+          case Authorize() =>
             for {
               _ <- {
                 val scopes   = scopesStore.getOrElse("required", Set.empty[String])
