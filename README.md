@@ -37,7 +37,6 @@ git clone -b exercise https://github.com/kzmake/grpc-with-eff-example
         - ドメイン層: 独自エフェクトの定義
         - アダプター層: インタープリターの実装
         - アダプター層: リポジトリの実装修正
-        - ユースケース層: 認可スコープの割り当て
         - 各層: _authz 追加
 
 > 🔔 3 の認可は簡易化のため `-H "principal: alice"` として認可対象を指定できるものとします。
